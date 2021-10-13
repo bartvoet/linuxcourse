@@ -5,6 +5,8 @@ CHAPTER_01 += ${pagebreak}
 CHAPTER_01 += installation.md
 CHAPTER_01 += ${pagebreak}
 CHAPTER_01 += tools_command_getting_started_linux.md
+CHAPTER_01 += ${pagebreak}
+CHAPTER_01 += users_and_groups.md
 
 
 

@@ -1,64 +1,680 @@
 ## Werken met een shell (Bash)
 
-Linux en Mac gebruiken beide bash als terminal.   
-Ondanks het feit dat sommige commando's bekend voorkomen uit de DOS-prompt, zijn er grote verschillen te bemerken tussen beide terminal-omgevingen.
+### Command-Line in Linux
 
-We gaan nu een overzicht maken van de meest gebruikte commando en principes.  
-We doen dit aan de hand van hetzelfde voorbeeld, dat we achteraf terug gebruiken voor onze eerste oefening met een compiler.  
+Een **"command line"** is een **tekst-georienteerde interface** die kan worden gebruikt om **diverse taken** binnen een **besturingssysteem uit te voeren**.  
 
-### Bash-shell openen
+De **command-line voor Linux** wordt geleverd door een **toepassing** die we de **shell** wordt genoemd.  
 
-Linux en Max hebben verschillende programma's waarmee je toegang kan hebben tot de shell.
+Op je Linux-systeem zal het je toelaten eender welke taak uit te voeren op je computer:
+
+* Files en folders te bewerken
+* Je besturingssysteem te configureren
+* Programma's op te starten
+* Met een netwerk te interageren
+* Taken te automatiseren
+* ...
+
+> *Nota*  
+> In Windows heb je als command-line-toepassing Bash of Powershell.  
+
+Een groot deel van de activiteiten die we gaan uitvoeren in Linux vereisen een goede kennis van de bash-terminal.  
+
+Het is dus zeer belangrijk deze goed onder de knie te krijgen en dat is wat in dit hoofdstuk zullen starten...
+
+### Bash
+
+De standaard shell voor gebruikers in Debian (maar ook veel andere Linux-distributies) is de **GNU Bourne-Again Shell** of afgekort **Bash**.  
+
+Bash is een **verbeterde versie** van een van de meest succesvolle shells die wordt gebruikt op UNIX-achtige systemen, de **Bourne Shell** (sh).
+
+#### Bash-shell openen
+
+Laten we **van start gaan**...
+Om een shell te openen vanuit een GUI bestaat er binnen Linux diverse **terminal-programma's** of **emulators**.  
+
+Om deze te openen binnen onze Linux-distro (Debian met Xfce) **selecteer** je binnen het menu **"Terminal Emulator"**:
+
+![](Pictures/debian_open_terminal.png)
+
+Vervolgens krijg je een **terminal-console** waar in je **commando's kan ingeven/uitvoeren**.
 
 ![](Pictures/bash_terminal.png)
 
-Eenmaal gestart krijg je een scherm zoals hieronder:  
+#### Shell-sessie
 
-~~~bash
-bart@bvpers4 ~ $
+Via zo'n **emulator/console** gaan we de **shell** als user **interactief** gaan gebruiken (later gaan we deze ook gebruiken via scripting).
+
+Nu deze console is geopend we van een **shell-sessie** (of bash-sessie om precies te zijn).  
+Dit is een programma dat **wacht** op **commando's** die je ingeeft en deze uitvoert als je op **enter** typt.
+
+De shell zal vervolgens wachter tot dit commando (of job) is uitgevoerd (tenzij dat je het als background-taak uitvoert) en de output van deze job uitvoeren.
+
+Volgende taak zal bijvoorbeeld de inhoud van je huidige work-directory afprinten:
+
+~~~
+student@studentdeb:~$ ls
+Desktop  Documents  Downloads  Music  Pictures  Public  Templates  Videos
+student@studentdeb:~$
 ~~~
 
-Deze **prompt** :
+#### Shell-prompt
 
-* geeft mee welke **user** ingelogd is
-* geeft aan welk **path** momenteel is gereferenceerd  
+Als je de **console** start verschijnt er een een stuk **tekst**, dat er ongeveer zo moeten uit zien:  
+
+~~~bash
+student@studentdeb:~ $
+~~~
+
+> *Nota:*  
+> Deze console kan verschillen tussen verschillende linux distributies.  
+> Over het algemeen zullen deze echter dicht bij komen.
+
+
+Dit is wat we noemen de **prompt** (of shell- of user-prompt), deze :
+
+* geeft mee welke **user** ingelogd is (bart)
+* geeft aan wat het huidige **path** - of **working directory** - momenteel is gereferenceerd (~)
   (in dit geval komt ~ overeen met de home-directory van de user)
 * geeft je mogelijkheid om een **commando** in te typen
 
-### File en directories
+Het dollar-teken ($) aan het einde is het einde van de prompt en geeft aan dat je commando's kan ingeven.  
+
+> *Nota:*  
+> Naast deze **default-prompt** gaan we verderop in de cusus nog zien dat ook nog een **superuser-prompt**, deze eindigt met een \# ipv een $, deze wordt gebruikt wanneer je wijzigingen aan het systeem wil aanbrengen met root-access (we komen hier weldra nog op terug)
+
+### Commando's in de shell
+
+Deze prompt geeft aan dat je dus een aantal commando's kan ingeven, laten we starten een aantal keren op de **return- of enter-toets** te duwen.
+
+~~~
+student@studentdeb:~$ 
+student@studentdeb:~$ 
+student@studentdeb:~$ 
+~~~
+
+Als je **niets typt** na de prompt en op enter drukt, dan gebeurt er niets en krijg je een **nieuwe prompt** onder de oude prompt.
+
+Als je terug **1 prompt wil zien** dan kan je het **commando** **clear** typen (gevolgd door een enter):
+
+~~~
+student@studentdeb:~$ 
+student@studentdeb:~$ 
+student@studentdeb:~$ clear
+~~~
+
+Vervolgens zie je dat je terug 1 user-prompt ziet...
+
+~~~
+student@studentdeb:~$ 
+~~~
+
+#### Commando-Argumenten
+
+Zo'n commando is telkens een programma dat wordt uitgevoerd, zelfs het éénvoudige programma clear dat we zo net hebben gebruikt.
+
+Veel van deze programma's hebben echter een argument nodig.  
+Laten we direct een **2de commando** gebruiken, **echo**
+
+~~~
+student@studentdeb:~$ echo hello
+hello
+student@studentdeb:~$ 
+~~~
+
+Dit **commando** heeft als **functie** een stuk **tekst** **af te drukken** naar de **console**.  
+
+Het stuk tekst dat je wil afdrukken kan je dan 
+gewoon aan dit programma meegeven als **argument**.
+
+Een **argument** volgt direct op het commando met dus volgende **vormfactor**:
+
+~~~
+[command] [arguments]
+~~~
+
+Zoals hierboven aangegeven kan het zijn dat je meer dan 1 argument meegeeft aan een commando.  
+Dat zullen we later nog zien bij andere commando's...
+
+#### Commando-opties
+
+Naast argumenten kan je ook nog extra **opties** meegeven.  
+Dit zijn **extra** opties (meestal niet verplicht) die je kan meegeven aan zo'n **commando** om het gedrag een te **beïnvloeden**.  
+Deze opties zijn meestal **voorafgegaan** door een **streepje** (- of ook hyphen genoemd).  
+
+Bijvoorbeeld, het echo-commando zal de tekst afdrukken maar daarna ook onmiddellijk een nieuwe lijn afdrukken.  
+Je kan dit gedrag wijzigen (geen nieuwe lijn afdrukken) door de **optie "-n"** mee te geven:
+
+~~~
+student@studentdeb:~$ echo -n hello
+hellostudent@studentdeb:~$ 
+~~~
+
+Deze drukt dus nog altijd de tekst af, maar in **tegenstelling** tot hieronder (zonder optie) zal deze **geen nieuwe lijn** afdrukken.
+
+~~~
+student@studentdeb:~$ echo hello
+hello
+student@studentdeb:~$ 
+~~~
+
+#### Linux commando's => vormfactor
+
+De meeste Linux (en Unix-programma's) gebruiken dan ook de volgende vormfactor:
+
+Na de commando-naam volgen dan 1 of meerder opties (telkens voorafgegaan door en een streepje) en dan pas op het einde gevolgd door argumenten.  
+
+~~~
+[command] [options] [arguments]
+~~~
+
+Deze opties zijn meestal afkortingen en bestaan uit (meestal) 1 karakter na het streepje.  
+Zo'n korte optie noemen we een **"SHORT-OPTION"**.
+
+#### SHORT en LONG-options
+
+Soms heb je echter zowel een **SHORT**- als een **LONG**-option.  
+Zo'n **LONG-option** wordt voorafgegaan door 2 streepjes (-- double hyphen)
+
+Soms heb je echter ook nog een langere versie of "long-option" zo'n optie.  
+Bij voorbeeld bij het commando ls dat je gebruikt om de inhoud van een directory te bekijken (zie ook eerder) heb je een optie "--all" waarmee je ook verborgen bestanden kan kijken.
+
+"--all" is hier een leesbaardere "LONG-option"
+
+~~~
+student@studentdeb:~$ ls --all
+.              .mozilla
+..             Music
+.bash_history  Pictures
+.bash_logout   .profile
+.bashrc        Public
+.cache         Templates
+.config        .vboxclient-clipboard.pid
+Desktop        .vboxclient-display-svga-x11.pid
+.dmrc          .vboxclient-draganddrop.pid
+Documents      .vboxclient-seamless.pid
+Downloads      Videos
+.gnupg         .Xauthority
+.ICEauthority  .xsession-errors
+.lesshst       .xsession-errors.old
+.local
+~~~
+
+Je kan echter daarnaast met een kortere "SHORT-options" trouwens net hetzelfde doen...
+
+~~~
+student@studentdeb:~$ ls -a
+.              .mozilla
+..             Music
+.bash_history  Pictures
+.bash_logout   .profile
+.bashrc        Public
+.cache         Templates
+.config        .vboxclient-clipboard.pid
+Desktop        .vboxclient-display-svga-x11.pid
+.dmrc          .vboxclient-draganddrop.pid
+Documents      .vboxclient-seamless.pid
+Downloads      Videos
+.gnupg         .Xauthority
+.ICEauthority  .xsession-errors
+.lesshst       .xsession-errors.old
+.local
+
+~~~
+
+### Shortcuts en shell-acties
+
+Binnen een bash-shell heb je een aantal features en shortcuts die je het leven gemakkelijk kunnen maken.
+
+#### Teruggaan in de historiek
+
+Zo'n eerste feature is dat een shell de **historiek** van je commando's onthoudt.  
+
+Om commando's te hergebruiken - die je eerder had ingegeven - kan je de **pijltjes-toetsen** gebruiken om eerder gebruikte commando's opnieuw op de console te tonen.
+
+Stel dat je 2 commando's na elkaar uitvoert:
+
+* "ls" => Oplijsten van de inhoud van de HOME-directory
+* "cd Desktop" => Navigeren naar de Desktop-directory
+
+Krijg je volgend resultaat:
+
+~~~
+student@studentdeb:~$ ls
+Desktop  Documents  Downloads  Music  Pictures  Public  Templates  Videos
+student@studentdeb:~$ cd Desktop/
+student@studentdeb:~/Destop$
+~~~
+
+Als je vervolgens het up-pijltje van je keyboard indrukt kan je terug het meest recente commando naar boven brengen.
+
+~~~
+student@studentdeb:~$ ls
+Desktop  Documents  Downloads  Music  Pictures  Public  Templates  Videos
+student@studentdeb:~$ cd Desktop/
+student@studentdeb:~/Desktop$ cd Desktop/
+~~~
+
+Als je dit een 2de maal indrukt krijg je het commando ls.  
+
+~~~
+student@studentdeb:~$ ls
+Desktop  Documents  Downloads  Music  Pictures  Public  Templates  Videos
+student@studentdeb:~$ cd Desktop/
+student@studentdeb:~/Desktop$ ls
+~~~
+
+Als je dan vervolgens op de enter-toets drukt wordt dat commando uitgevoerd.
+
+~~~
+student@studentdeb:~$ ls
+Desktop  Documents  Downloads  Music  Pictures  Public  Templates  Videos
+student@studentdeb:~$ cd Desktop/
+student@studentdeb:~/Desktop$ ls
+student@studentdeb:~/Desktop$ 
+~~~
+
+#### Tab-completion
+
+~~~
+student@studentdeb:~/Desktop$ e
+echo                   encguess               exfalso
+edit                   enchant-2              exit
+editor                 enchant-lsmod-2        exo-desktop-item-edit
+editres                env                    exo-open
+egrep                  envsubst               expand
+eject                  eqn                    expiry
+elif                   esac                   export
+else                   eval                   expr
+enable                 ex                     
+enc2xs                 exec                   
+student@studentdeb:~/Desktop$ ec 
+~~~
+
+Als je dan vervolgens er een c (na de e) typt
+
+~~~
+...                 
+student@studentdeb:~/Desktop$ ec
+~~~
+
+En opnieuw de tab tikt dan zal de bash-shell het commando geven (gezien dat dit not het enige is)
+
+~~~
+...                 
+student@studentdeb:~/Desktop$ echo
+~~~
+
+#### Programma beëindigen met Ctrl+C
+
+Soms kan het zijn dat je een commando intikt dat niet van zich zelf zal stoppen (bedoeld of onbedoeld).
+
+Stel bijvoorbeeld dat je het volgende commando type
+
+~~~
+$ cat /dev/random
+... heel wat rommel op je schermt...
+$
+~~~
+
+Dit zal heel wat rommel op je console afdrukken (en zal niet van zichzelf stoppen).
+
+Als je echter **Ctrl+C** typt kan je dit programma beëindigen en terug beschikking hebben over de shell.
+
+Dit key-combinatie zal een **interrupt-signaal** doorsturen naar de applicatie en er voor zorgen dat deze wordt afgesloten.
+
+> *Nota*:  
+> Hoewel dit zal werken voor de meeste programma's
+> kan een programma dit interrupt-signaal opvangen
+> (en dus negeren).  
+> In dat geval zijn er nog andere manieren om een 
+> job af te sluiten.  
+> We komen hier in het gedeelte rond jobs en processen nog 
+> op terug (waar we ook wat meer diepgang zullen meegeven over
+> deze signalen).  
+> Voorlopig is het voldoende te weten dat Ctrl+C een
+> programma kan onderbreken
+
+#### Afluiten met Ctrl+D (of het exit-commando)
+
+Als je de shell **sessie** wil **afsluiten** kan je dit doen met het **exit** commando of de key-combinatie **Ctrl-D** 
+
+### Files en directories
+
+Net zoals de meeste besturingssystemen heeft Linux 2 belangrijke elementen om informatie bij te houden en te structureren:
+
+* Files (bestanden)
+* Directories (folders/mapjes)
+
+#### Geen C-schijf...
+
+De structuur van een Linux-filesystem (bestandssysteem) verschilt wel enigszins van wat de meesten gewoon zijn onder Windows.  
+
+Linux heeft geen **fysieke schijf** (zoals de C: schijf) aan de basis van het filesysteem.  
+In plaats daarvan wordt er een **logisch bestandssysteem** gebrukt.  
+
+![](Pictures/roothierachy.png)
+
+Helemaal bovenaan het filesystem-structuur is **/**, men noemt dit meestal ook **root** van het **bestandssysteem** (niet te verwarren met de root-user).  
+
+#### Linux File Hierarchy
+
+Onder deze root bevinden zich een hele hoop directories en bestanden hiërarchisch geordend (een beetje zoals een wortel-systeem)
+
+~~~
+/ ──+
+    ├── bin -> usr/bin (link)
+    ├── boot
+    ├── dev
+    ├── etc
+    └── home
+          └── student
+          └── bart
+    ├── media
+    ├── mnt
+    ├── opt
+    ├── proc
+    ├── root
+    ├── run
+    ├── sbin -> usr/sbin (link)
+    ├── srv
+    ├── sys
+    ├── tmp
+    └── usr
+        ├── bin
+        ├── include
+        ├── lib
+        ├── local
+        └── sbin
+    └── var
+~~~
+
+Direct onder deze root-directory bevinden zich een aan systeem-directories.  
+Deze bevatten software, libraries, scripts, configuratie-bestanden, ...
+
+* **/etc/** => **configuraties** van het systeem
+* **/boot/** => **kernel** en andere **boot-files**
+* **/run/** => **data** ivm **processen**, geopende files, ...
+* **/usr/** => geinstalleerde **software**, applicaties, libraries
+* **/root/** => **home**-directory voor de **superuser** (niet binnen /home/)
+* **/tmp/** => **tijdelijke files** (wordt regelmatig opgekuist)
+* **/var/** => variabele data die wel moet worden opgeslagen tussen boots
+* **/bin/** en /sbin => shortcuts naar gelijnamige directories binnen /usr
+* **/dev/** => bevat speciale **"device"-files** gebruikt om met hardware te connecteren
+* ...
+
+Als je in detail wil weten waar elke van deze directories voor wordt gebruikt kan je gebruik maken van het command "man hier"
+
+#### Filepath
+
+Zoals eerder vermeld, de directory **/** of **root** is de **hoofd-directory** bovenaan de **hiërarchie** van het bestandssysteem.  
+
+Dit **/-karakter** wordt ook gebruikt als scheidingsteken in een **path** (pad).  
+Dit **path** gebruik je zoals een address binnen een command-line of script om een bestand of filename te lokaliseren.  
+
+Bijvoorbeeld het filepath naar de directory /home/student/Desktop geeft aan dat:
+
+* **Desktop** een **subdirectory** is van **student**
+* **student** van **home** (op zijn beurt)
+* **home** van de **root**-directory
+
+~~~
+  / 
+  └── home
+        ├── bart
+        └── student
+              └── Desktop
+~~~
+
+Onder deze verschillende **directories** kan je dan bestanden plaatsen.  
+Deze bestanden kan je dan gemakkelijk terugvinden en **adresseren** via een path, we noemen dit ook soms wel een **filepath**.
+
+We **breiden** bovenstaand **voorbeeld** uit door files te **plaatsen** onder deze **directories**.
+Als je bijvoorbeeld het bestand sensors.json wil gebruiken...
+
+~~~
+  / 
+  └── home
+        ├── bart
+        └── student
+              ├── hello.csv
+              ├── test.xml
+              └── data
+                    └── sensors.json
+~~~
+
+... kan dit via het **path** **/home/student/data/sensors.json**
+
+Dit is wat we noemen een **absoluut path**, een adressering vanaf de root-directory.  
+Naast een absoluut path bestaat er ook nog een **relatief** path, daar komen we zo dadelijk nog op terug. 
+
+#### Working-directory
+
+We starten met het aanmaken van een **directory** waarin we onze C-code gaan plaatsen.  
+We starten vanuit de volgende hiërarchie die automatisch zou moeten zijn aangemaakt na de installatie:
+
+> *Nota:*  
+> Er vanuitgaande dat je student als user-name hebt gekozen zoals gevraagd...
+
+~~~
+  / 
+  └── home
+        └── student
+              ├── Desktop
+              └── Documents
+~~~
+
+Als je de command-line opent krijg je volgende shell:
+
+![](Pictures/cmd_homedir.png)
+
+Als je een interactieve shell of command-line start deze zich in een specifiek directory.  
+Je kan weten waar je exact aan het werken bent via het commando **pwd** ofwel "**pr**int **w**orking **d**irectory" welk aangeeft welke je actieve of **working**-directory is
+
+~~~
+student@studentdeb:~$ pwd
+/home/student
+student@studentdeb:~$ 
+~~~
+
+#### Inhoud tonen met ls
+
+Onder GNU/Linux (en andere unix-varianten) is **ls** ofwel "**l**i**s**t) een commando om de inhoud van een directory weer te geven.  
+
+~~~
+student@studentdeb:~$ ls
+Desktop  Documents  Downloads  Music  Pictures  Public  Templates  Videos
+student@studentdeb:~$ 
+~~~
+
+Zonder argumenten wordt de inhoud van de werkdirectory (= huidige directory) getoond.  
+Als je de inhoud wil tonen van een subdirectory kan je deze als argument gebruiken:
+
+~~~
+student@studentdeb:~$ ls Documents/
+hello  myhistory  tweedehistory
+~~~
+
+Als je meer details te weten wil komen kan je ls met de **optie -l** combineren:
+
+~~~
+student@studentdeb:~$ ls -l Documents/
+total 12
+drwxr-xr-x 2 student student 4096 Sep 29 20:24 hello
+-rw-r--r-- 1 student student 3063 Sep 29 21:33 myhistory
+-rw-r--r-- 1 student student 2794 Sep 29 21:16 tweedehistory
+~~~
+
+Dit toont meer volledige info zoals:
+
+* type van item
+  * **d** staat voor directory
+  * **\-** voor een gewone file
+* permissies (zie hoofdstuk rond users en permissies)
+* user en group (zie hoofdstuk rond users en permissies)
+* tijd van laatste aanpassing
+* size
+* ...
+
+Een aantal andere opties die handig kunnen zijn:
+
+* \-S: sorteer op bestandsgrootte
+* \-t: sorteer op tijd
+* \-r: draai de volgorde om (van het sorteren)
+* \-R: recursief, geef ook de inhoud van de subdirectory('s) weer
+* \-a: geef ook verborgen bestanden weer (die beginnen met een punt)
+* \-d: geef bij directory-items niet de inhoud ervan weer, maar slechts de directorynaam zelf
+
+
+#### Navigeren met cd
+
+Je kan deze **working-directory** ook **wijzigen** met het commando **cd** ofwel "**c**hange **d**irectory
+
+~~~
+student@studentdeb:~$ cd Documents/
+student@studentdeb:~/Documents$ pwd
+/home/student/Documents
+student@studentdeb:~/Documents$ ls -l
+total 12
+drwxr-xr-x 2 student student 4096 Sep 29 20:24 hello
+-rw-r--r-- 1 student student 3063 Sep 29 21:33 myhistory
+-rw-r--r-- 1 student student 2794 Sep 29 21:16 tweedehistory
+~~~
+
+##### Super-directory
+
+Als je naar een hogere directory (of de **super-directory**) wil navigeren kan je de placeholder **..** hiervoor gebruiken.
+
+~~~
+student@studentdeb:~/Documents$ cd ..
+student@studentdeb:~$ pwd
+/home/student
+student@studentdeb:~$ ls -l
+total 32
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Desktop
+drwxr-xr-x 3 student student 4096 Oct 10 20:48 Documents
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Downloads
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Music
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Pictures
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Public
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Templates
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Videos
+student@studentdeb:~$ ls ..
+student
+student@studentdeb:~$
+~~~
+
+Je kan ook **meerdere niveaus** naar boven verwijzen mits je deze **..** scheidt door een **/**
+
+~~~
+student@studentdeb:~$ ls ../..
+bin   home            lib32       media  root  sys  vmlinuz
+boot  initrd.img      lib64       mnt    run   tmp  vmlinuz.old
+dev   initrd.img.old  libx32      opt    sbin  usr
+etc   lib             lost+found  proc   srv   var
+student@studentdeb:~$ 
+~~~
+
+##### Vorige directory
+
+Een handige **shortcut** (bij cd) is de **combinatie** van **cd** met een **hyphen** (streepje).  
+Als je volgend commando uitvoert...
+
+~~~
+student@studentdeb:~$ cd -
+/home/student/Documents
+student@studentdeb:~/Documents$ 
+~~~
+
+...keer je terug naar de **vorige working-directory** die je gebruikte in je shell-sessie
+
+#### HOME-directory
+
+/home/student/ is de **HOME-directory**, net zoals je onder Windows een home-directory "C:\Users\student" zou hebben.  
+
+Als je inlogt in een shell-venster kom je automatisch terecht in deze home directory.  
+Als je van een andere working-directory echter terug naar je HOME-directory wil navigeren kan je cd gebruiken zonder argument.
+
+~~~
+student@studentdeb:~/Documents$ pwd
+/home/student/Documents
+student@studentdeb:~/Documents$ cd
+student@studentdeb:~$ pwd
+/home/student
+student@studentdeb:~$ 
+~~~
+
+Er zijn nog **2 andere shortcuts** om naar de **HOME-directory** te verwijzen
+
+* De environment-variabele **$HOME**
+* Een tilde of ~ 
+
+Deze kan je bijvoorbeeld gebruiken om de lijst van files te tonen van je home-directory (vanuit een andere directory)
+
+~~~
+student@studentdeb:~/Documents$ ls
+hello  myhistory  tweedehistory
+student@studentdeb:~/Documents$ ls ~
+Desktop  Documents  Downloads  Music  Pictures  Public  Templates  Videos
+student@studentdeb:~/Documents$ ls $HOME
+Desktop  Documents  Downloads  Music  Pictures  Public  Templates  Videos
+student@studentdeb:~/Documents$ 
+~~~
 
 #### Een directory aanmaken
 
-We starten met het aanmaken van een **directory** waarin we onze C-code gaan plaatsen.
+Na het navigeren volgt het aanmaken van directories en files.  
+We gaan volgende bestanden aanmaken:
 
-~~~bash
-bart@bvpers4 ~ $ mkdir een_eerste_programma
-bart@bvpers4 ~ $ ls
-... een_eerste_programma Documents Games ...
+~~~
+  / 
+  └── home
+        ├── bart
+        └── student
+              ├── hello.csv
+              ├── test.xml
+              └── data
+                    └── sensors.json
 ~~~
 
-Hier zien we in 1 klap 2 commando's:
+We starten met de directory data aan te maken:
 
-* **mkdir** gevolg door het path **een_eerste_programma**  
-  Dit maakt een nieuwe folder of directory deze naam.  
-* Het commando **ls**  
-  Laat ons toe de **inhoud** na te kijken van de huidige **directory**
-
-
-#### Navigeren door directories
-
-Als je deze directory hebt aangemaakt kan je hiernaartoe navigeren via het commando **cd**  
-(hetgeen staat voor change directory)
-
-~~~bash
-bart@bvpers4 ~ $ cd een_eerste_programma
-bart@bvpers4 ~/een_eerste_programma $ pwd
-/home/bart/een_eerste_programma
-bart@bvpers4 ~/een_eerste_programma $
+~~~
+student@studentdeb:~$ mkdir data
+student@studentdeb:~$ ls -l
+total 36
+drwxr-xr-x 2 student student 4096 Oct 13 13:04 data
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Desktop
+drwxr-xr-x 3 student student 4096 Oct 10 20:48 Documents
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Downloads
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Music
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Pictures
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Public
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Templates
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Videos
+student@studentdeb:~$ 
 ~~~
 
-Het gebruik is éénvoudig, je navigeert door cd te typen gevolgd door het path naar deze directory.  
-Het commando **pwd** print in dit geval de gehele huidige directory af.  
+**mkdir** gevolg door het path **data** nieuwe directory of folder aan.  
+
+Zonder argumenten kan je enkel **1 niveau van folder** aanmaken, stel dat je bijvoorbeeld een parent en child-folder in 1 maal wil aanmaken gaat dit niet zomaar:
+
+~~~
+student@studentdeb:~$ mkdir hello/world
+mkdir: cannot create directory ‘hello/world’: No such file or directory
+~~~
+
+Als je echter de optie -p meegeeft zullen de parent-folders (hello in dit geval) mee worden  aangemaakt als deze nog niet mochten bestaan:
+
+~~~
+student@studentdeb:~$ mkdir -p hello/world
+student@studentdeb:~$ ls hello
+world
+student@studentdeb:~$ ls -l hello
+total 4
+drwxr-xr-x 2 student student 4096 Oct 13 13:07 world
+student@studentdeb:~$ 
+~~~
 
 #### Relatieve vs absolute path
 
@@ -69,146 +685,187 @@ Er zijn een aantal manieren waarop je een path kan construeren, het grootste ond
 
 * **absoluut** is een path dat start vanaf de root-directory, dit path start namelijk vanaf de schijf waar je wil naar verwijzen
 
-~~~bash
-bart@bvpers4 ~ $ cd /home/bart/een_eerste_programma
-bart@bvpers4 ~/een_eerste_programma $ pwd
-/home/bart/een_eerste_programma
-bart@bvpers4 ~/een_eerste_programma $
+~~~
+student@studentdeb:~$ cd /home/student/hello/world/
+student@studentdeb:~/hello/world$ pwd
+/home/student/hello/world
+student@studentdeb:~/hello/world$ 
 ~~~
 
 Dit start altijd me een verwijzing naar de root-directory
 
 * **relatief** verwijst naar een locatie relatief naar je huidige directory
 
-~~~bash
-bart@bvpers4 ~ $ cd een_eerste_programma
-bart@bvpers4 ~/een_eerste_programma $ pwd
-/home/bart/een_eerste_programma
-bart@bvpers4 ~/een_eerste_programma $ cd ../een_andere_directory
-bart@bvpers4 ~/een_andere_directory $
+~~~
+student@studentdeb:~$ cd hello/world/
+student@studentdeb:~/hello/world$ pwd
+/home/student/hello/world
+student@studentdeb:~/hello/world$ 
 ~~~
 
-Dit verwijst van je huidige directory naar een path relatief tov je huidige directory.  
-Het symbool **..** (2 dots na elkaar) kan je altijd gebruiken om naar de super-directory te verwijzen
+Het symbool **..** (2 dots na elkaar) kan je ook gebruiken in deze relatieve paden:
 
-#### Home-directory
-
-Elke user op unix-systemen heeft een home-directory, in bash kan je daarna verwijzen met het teken ~  
-Ook cd typen zonder iets zorgt dat je in de home-directory geraakt
-
-~~~bash
-bart@bvpers4 ~ $ cd ..
-bart@bvpers4 /home $ cd
-bart@bvpers4 ~ $ pwd
-/home/bart
-bart@bvpers4 ~ $ cd ..
-bart@bvpers4 /home $ cd ~
-bart@bvpers4 ~ $ pwd
-/home/bart
-bart@bvpers4 ~ $
+~~~
+student@studentdeb:~/hello/world$ cd ../../data/
+student@studentdeb:~/data$ pwd
+/home/student/data
 ~~~
 
-#### Directories verwijderen
+Of het voorgaande substitiekarakter ~ 
 
-Een directory kan verwijderd worden door het commando rmdir.  
+~~~
+student@studentdeb:~/data$ cd ~/data/
+student@studentdeb:~/data$ pwd
+/home/student/data
+~~~
+
+#### Een lege file aanmaken via touch
+
+File aanmaken kan je doen met het commando **touch**
+
+~~~
+student@studentdeb:~/data$ touch sensors.json
+student@studentdeb:~/data$ ls -l
+total 0
+-rw-r--r-- 1 student student 0 Oct 13 13:27 sensors.json
+student@studentdeb:~/data$ 
+~~~
+
+Als het bestand reeds bestaat zal touch echter alleen de update-datum aanpassen:
+
+~~~
+student@studentdeb:~/data$ touch sensors.json 
+student@studentdeb:~/data$ ls -l
+total 0
+-rw-r--r-- 1 student student 0 Oct 13 13:29 sensors.json
+~~~
+
+#### Directories en files verwijderen
+
+Een directory kan verwijderd worden door het commando **rmdir**.  
 Deze directory mag wel geen files bevatten anders zal deze een fout-code opleveren
 
-~~~bash
-bart@bvpers4 ~ $ rmdir een_eerste_programma
-bart@bvpers4 ~ $ cd een_eerste_programma
-bash: cd: een_eerste_programma: No such file or directory
+~~~
+student@studentdeb:~$ rmdir data
+rmdir: failed to remove 'data': Directory not empty
 ~~~
 
-Als je nadien naar deze directory probeert te gaan krijg je een boodschap dat deze directory niet bestaat.
+Als je een directory wil deleten dien je eerst de files daarbinnen te deleten.  
+Dit kan je via het commando **rm**
 
-#### Files in een directory
-
-We maken opnieuw een directory aan, deze keer navigeren we ook naar deze directory.
-
-~~~bash
-bart@bvpers4 ~ $ cd mijn_eerste_programma/
-bart@bvpers4 ~/mijn_eerste_programma $ ls
-bart@bvpers4 ~/mijn_eerste_programma $
+~~~
+student@studentdeb:~$ rm data/sensors.json 
+student@studentdeb:~$ ls data
+student@studentdeb:~$
 ~~~
 
-Vervolgens maken we via een **texteditor** (bijvoorbeeld gedit zoals eerder besproken) aan, en copieren we volgende inhoud  naar een file:
+Eénmaal de directory leeg is kan je deze deleten via het commando rmdir
 
-~~~c
-print("Hello World")
 ~~~
-
-Deze file bewaren we onder de eerder aangemaakte directory onder de naam hello.py.  
-Nadien kijken we na met het ls-commando of deze file correct is aangemaakt.  
-
-~~~bash
-bart@bvpers4 ~/mijn_eerste_programma $ ls
-hello.py
-~~~
-
-#### Inhoud van een file tonen op command-line
-
-Stel dat je deze file alleen wil lezen bestaat er ook de mogelijkheid vanuit de command-line deze file te lezen.  
-Dit kan door de inhoud van deze file naar de command-line af te drukken via het commmando **cat**
-
-~~~bash
-bart@bvpers4 ~/mijn_eerste_programma $ cat hello.c
-print("Hello World")
+student@studentdeb:~$ rmdir data
+student@studentdeb:~$ ls -l
+total 36
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Desktop
+drwxr-xr-x 3 student student 4096 Oct 10 20:48 Documents
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Downloads
+drwxr-xr-x 3 student student 4096 Oct 13 13:07 hello
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Music
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Pictures
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Public
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Templates
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Videos
 ~~~
 
 #### Copieren van een file
 
-Je kan ook een file via de terminal copieren via het commando COPY
+Je kan ook een file via de terminal copieren via het commando cp ofwel "**c**o**p**y"
 
 ~~~bash
-bart@bvpers4 ~/mijn_eerste_programma $ cp hello.py hello.txt
-bart@bvpers4 ~/mijn_eerste_programma $ ls
-hello.py hello.txt
+student@studentdeb:~$ touch test.txt
+student@studentdeb:~$ cp test.txt test2.txt
+student@studentdeb:~$ ls -l
+total 36
+...
+-rw-r--r-- 1 student student    0 Oct 13 13:37 test2.txt
+-rw-r--r-- 1 student student    0 Oct 13 13:36 test.txt
+...
 ~~~
 
-#### Verwijderen van een file
+#### Copieren van een directory
 
-Gezien we deze file niet nodig hebben (voor het vervolg van onze cursus) gaan we deze verwijderen.  
-We gebruiken hiervoor het **rm**-commando op nieuw gevolgd door het path naar deze file.
+Dit comando geldt ook voor directories maar als deze niet leeg zijn moet je hier de optie -r aan toevoegen
 
 ~~~bash
-bart@bvpers4 ~/mijn_eerste_programma $ ls
-hello.py hello.txt
-bart@bvpers4 ~/mijn_eerste_programma $ rm hello.txt
-bart@bvpers4 ~/mijn_eerste_programma $ ls
-hello.py
-~~~
-> **Nota:**  
-> Net zoals bij andere commando's kan je een file aanduiden met zowel een relatief als een absoluut path
-
-### Uitvoeren van programma's
-
-Naast het bekijken en manipuleren van je file-systeem kan je ook programma's uit voeren.  
-Bijvoorbeeld onderstaand voorbeeld voert de python-interpreter uit met als argument de python-file
-
-~~~bash
-bart@bvpers4 ~/mijn_eerste_programma $ ls
-hello.py
-bart@bvpers4 ~/mijn_eerste_programma $ python hello.py
-Hello World
+student@studentdeb:~$ cp Documents/ DocumentsCopy/
+cp: -r not specified; omitting directory 'Documents/'
+student@studentdeb:~$ cp -r Documents/ DocumentsCopy/
+student@studentdeb:~$ ls -lrt
+total 40
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Videos
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Templates
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Public
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Pictures
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Music
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Downloads
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Desktop
+drwxr-xr-x 3 student student 4096 Oct 10 20:48 Documents
+drwxr-xr-x 3 student student 4096 Oct 13 13:07 hello
+-rw-r--r-- 1 student student    0 Oct 13 13:36 test.txt
+-rw-r--r-- 1 student student    0 Oct 13 13:37 test2.txt
+drwxr-xr-x 3 student student 4096 Oct 13 13:39 DocumentsCopy
 ~~~
 
-### Environment-variabelen
+#### Verplaatsen van files en directories
+
+Om een bestand of file te verplaatsen naar een directory kan je het commando **mv** ofwel **m**o**v**e gebruiken:
+
+~~~
+student@studentdeb:~$ mv hello/ Documents
+student@studentdeb:~$ ls -l Documents
+total 12
+drwxr-xr-x 3 student student 4096 Oct 13 13:07 hello
+-rw-r--r-- 1 student student 3063 Sep 29 21:33 myhistory
+-rw-r--r-- 1 student student 2794 Sep 29 21:16 tweedehistory
+~~~
+
+#### Naam wijzigen van een file
+
+Hetzelfde commando kan je ook gebruiken als je een file of directory van naam wil wijzigen.
+
+~~~
+student@studentdeb:~$ mv test.txt test
+student@studentdeb:~$ ls -lrt
+total 36
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Videos
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Templates
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Public
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Pictures
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Music
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Downloads
+drwxr-xr-x 2 student student 4096 Sep 26 20:49 Desktop
+-rw-r--r-- 1 student student    0 Oct 13 13:36 test
+-rw-r--r-- 1 student student    0 Oct 13 13:37 test2.txt
+drwxr-xr-x 3 student student 4096 Oct 13 13:39 DocumentsCopy
+drwxr-xr-x 3 student student 4096 Oct 13 14:08 Documents
+student@studentdeb:~$ 
+~~~
+
+### Shell-variabelen
 
 Een shell laat toe om - zoals in een programmmeer-taal - variabelen aan te maken en te gebruiken.
 
-### Een environment-variabele definieren
+#### Een environment-variabele definieren
 
 Een environment-variabele is een variabele (eigenlijk een stuk tekst) die door de shell wordt bijgehouden gedurende de terminal-sessie.  
 
 Het volgende voorbeeld gebruikt bijvoorbeeld dit mechanisme om een het path naar je project bij te houden
 
 ~~~
-bart@bvpers4 ~ $ MIJN_PROJECT=/home/bart/mijn_eerste_programma
-bart@bvpers4 ~ $ echo $MIJN_PROJECT
-/home/bart/mijn_eerste_programma
-bart@bvpers4 ~ $ cd $MIJN_PROJECT
-bart@bvpers4 ~/mijn_eerste_programma $
-
+student@studentdeb:~$ MY_DATA_FOLDER=/home/student/Documents
+student@studentdeb:~$ echo $MY_DATA_FOLDER 
+/home/student/Documents
+student@studentdeb:~$ cd $MY_DATA_FOLDER 
+student@studentdeb:~/Documents$ 
 ~~~
 
 * Zo'n variabele kan je initialiseren via door de **naam** van deze variabele
@@ -225,11 +882,11 @@ bart@bvpers4 ~/mijn_eerste_programma $
 Naast je eigen variabelen houdt je operating systeem ook een aantal variabelen bij.  
 
 ~~~bash
-bart@bvpers4 ~ $ cd een_directory_die_niet_bestaat
-bart@bvpers4 ~ $ echo $?
+student@studentdeb:~$ cd een_directory_die_niet_bestaat
+student@studentdeb:~$ echo $?
 1
-bart@bvpers4 ~ $ cd mijn_eerste_programma/
-bart@bvpers4 ~/mijn_eerste_programma $ echo $?
+student@studentdeb:~$ cd Documents/
+student@studentdeb:~/Documents$ echo $?
 0
 ~~~
 
