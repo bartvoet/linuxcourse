@@ -519,7 +519,7 @@ Je navigeert naar deze
 Je voert de installatie-procedure uit door het volgende commando's:
 
 ~~~
-sh ./VboxLinuxAdditions.run \--nox11
+sh ./VboxLinuxAdditions.run --nox11
 ~~~
 
 ![](Pictures/100000000000032200000258AFDEC1E52B0A4ECF.png)
