@@ -525,7 +525,6 @@ Een aantal andere opties die handig kunnen zijn:
 * \-a: geef ook verborgen bestanden weer (die beginnen met een punt)
 * \-d: geef bij directory-items niet de inhoud ervan weer, maar slechts de directorynaam zelf
 
-
 #### Navigeren met cd
 
 Je kan deze **working-directory** ook **wijzigen** met het commando **cd** ofwel "**c**hange **d**irectory

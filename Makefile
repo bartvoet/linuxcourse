@@ -9,6 +9,14 @@ CHAPTER_01 += ${pagebreak}
 CHAPTER_01 += users_and_groups.md
 CHAPTER_01 += ${pagebreak}
 CHAPTER_01 += modbits.md
+CHAPTER_01 += ${pagebreak}
+CHAPTER_01 += nano.md
+CHAPTER_01 += ${pagebreak}
+CHAPTER_01 += bash.md
+CHAPTER_01 += ${pagebreak}
+CHAPTER_01 += processes.md
+CHAPTER_01 += ${pagebreak}
+CHAPTER_01 += integration_excercise.md
 
 
 

@@ -1,0 +1,742 @@
+## Bash (vervolg)
+
+### Patterns
+
+De Bash shell beschikt over verschillende manieren om het werken met een command-line te vergemakkelijken.  
+Eerder hadden we gezien dat we features gezien zoals:
+
+* **Tab-completion**: hij het zoeken naar commando's zal de shell een poging doe om deze te vervolledigen (bij het gebruik van tab)
+* **History**
+  * Met de **up** en **down**-**keys** kan je door de meest recente commando's scrollen
+  * **Recall-mode** of **reverse-i-search**  
+    via **Ctrl + r** kan je door alle commando's browsen overeenstemmende die een bepaalde tekst bevatten
+  * Het **history-command**
+  * ...
+
+Een aantal andere **features** die je het leven gemakkelijker maken zijn:
+
+* **Wildcards**/pattern matching (of globbing)
+* **Tilde** expansion
+* **Variable substitution**
+* **Command substitution**
+
+#### Globbing/wildcards
+
+Bij het gebruik van **ls** (of andere commando die als input files nodig hebben) kan je 
+via patronen een selectie maken van bestanden die met een bepaald patroon over eenkomen.
+
+In onderstaande directory zie je heel veel files
+
+~~~
+student@studentdeb:~$ ls -l
+total 160
+-rw-r--r-- 1 student student      0 Nov 24 15:30  a
+-rw-r--r-- 1 student student    602 Oct 13 22:19  aaa
+-rw-r--r-- 1 student student      0 Nov 24 15:30  a_file
+...
+drwxr-xr-x 2 student student   4096 Oct 27 19:06  hello
+-rw-r----- 1 student student      0 Nov 24 16:13  hello2
+drwxr-x--x 2 student student   4096 Nov 24 16:13  hello2_dir
+drwxr-xr-x 2 student student   4096 Nov 24 15:57  hello_dir
+-rw-r--r-- 1 student student      0 Nov 24 15:39  hellofile
+-rwxr--r-- 1 student student     92 Dec 15 15:12  hello.sh
+-rw-r--r-- 1 student student      0 Nov 24 15:57  hello.txt
+drwxr-xr-x 2 student student   4096 Nov 24 19:39  helloworld
+-rwxr--r-- 1 student student    226 Dec 15 20:37  helloworld.sh
+drwxr-xr-x 2 student student   4096 Sep 26 20:49  Music
+-rw-r--r-- 1 student student     41 Dec 15 18:47  nanotest
+drwxr-xr-x 2 student student   4096 Sep 26 20:49  Pictures
+-rw-r--r-- 1 student student      0 Oct 27 20:30  ppp
+drwxr-xr-x 2 student student   4096 Sep 26 20:49  Public
+-rwxr--r-- 1 student student     99 Nov 24 21:34  sayhello.sh
+drwxrwxr-- 2 student students  4096 Oct 27 21:13  shared
+-rw-r----- 1 student students    12 Oct 13 21:49  sharedfile
+drwxr-xr-x 2 student student   4096 Sep 26 20:49  Templates
+---------- 1 student student      0 Nov 24 19:58  test
+drwxrwsrwx 2 student student   4096 Nov 24 19:21  testa
+drwxr-xr-x 2 student student   4096 Nov 24 14:05  test_dir
+-rwsr--r-- 1 student student      0 Nov 24 15:36  testeje
+-rwxrwxrwx 1 bart    bart         0 Nov 24 13:59  test_file
+-rw-r--r-- 1 student student   3720 Dec 15 21:17  test.txt
+...
+~~~
+
+Als je echter je zoekactie wil beperken/filteren tot files en directories **startende** met bijvoorbeeld "**hello**" 
+kan je hiervoor gebruikmaken van het ***-meta-karakter**
+
+Dit karakter matcht met **0 tot meerdere karakters**
+
+Onderstaande expressie zal bijvoorbeeld enkel de files en directories oplijsten startende met hello
+
+~~~
+student@studentdeb:~$ ls -l hello*
+-rw-r----- 1 student student    0 Nov 24 16:13 hello2
+-rw-r--r-- 1 student student    0 Nov 24 15:39 hellofile
+-rwxr--r-- 1 student student   92 Dec 15 15:12 hello.sh
+-rw-r--r-- 1 student student    0 Nov 24 15:57 hello.txt
+-rwxr--r-- 1 student student  226 Dec 15 20:37 helloworld.sh
+
+hello:
+total 4
+-rwxr--r-- 1 student student 13 Oct 27 19:06 world.sh
+
+hello2_dir:
+total 0
+
+hello_dir:
+total 0
+
+helloworld:
+total 0
+~~~
+
+Je kan deze wildcard overal toevoegen als je bijvoorbeeld alle files wil selecteren.  
+Stel dat je **alle shell-files** wil selecteren **startende met hello**:
+
+~~~
+student@studentdeb:~$ ls -l hello*sh
+-rwxr--r-- 1 student student  92 Dec 15 15:12 hello.sh
+-rwxr--r-- 1 student student 226 Dec 15 20:37 helloworld.sh
+student@studentdeb:~$ 
+~~~
+
+Je bent ook niet beperkt tot 1 metakarakter:
+
+~~~
+student@studentdeb:~$ ls -l h*w*sh
+-rwxr--r-- 1 student student 226 Dec 15 20:37 helloworld.sh
+~~~
+
+#### Pattern matching
+
+Het karakter **``*``** matcht met eender welke string, maar er zijn er nog meer van deze symbolen die je kan gebruiken.  
+Je kan bijvoorbeeld ook gaan matchen op 1 enkel karakter met het ?-karakter.
+
+
+~~~
+* => Eender welke sequentie van karakters (string), maar ook met niets
+? => een enkel karakter
+~~~
+
+Gegeven het volgende **voorbeeld**:
+
+~~~
+student@studentdeb:~$ ls file*
+file  file1  file11  file2 filea fileb
+~~~
+
+In dit geval hebben we **4 files** die **starten** met "**file**": file, file1, file11 en file2.  
+Met het * hebben we alle files geselecteerd die starten met file (ook file zelf)  
+Vervolgens met het ?-karakter selecteer je alle files (startende met file) gevolgd door 1 karakter.
+
+~~~
+student@studentdeb:~$ ls file?
+file1  file2 filea fileb
+student@studentdeb:~$ 
+~~~
+
+Als je bijvoorbeeld wil **testen** op **2 karakter**s gebruik je gewoon **2 vraagtekens**:
+
+~~~
+student@studentdeb:~$ ls file??
+file11
+student@studentdeb:~$ 
+~~~
+
+##### Karakter-klassen
+
+Daarnaast kan je ook **testen** op **specifieke karakters**:
+
+~~~
+[abc] => 1 van de karakters (in het voorbeeld a of b of c) 
+[!abc] of [^abc] => negatie van het vorige => eender welk karakter (in het voorbeeld a of b of c) 
+~~~
+
+Met als volgend **voorbeeld**...
+
+~~~
+student@studentdeb:~$ ls file?
+file1  file2  filea  fileb
+student@studentdeb:~$ ls file[ac]
+filea
+student@studentdeb:~$ ls file[!ac]
+file1  file2  fileb
+~~~
+
+Of specifieke karakter-klassen
+
+~~~
+[[:alpha:]] => Alfabetische karakters (a tem z)
+[[:lower:]] => Zelfde als voorgaande maar lowercase
+[[:upper:]] => Zelfde als voorgaande maar uppercase
+[[:digit:]] => Any single digit from 0 to 9.
+[[:alnum:]] => Alfanumerieke karaketers
+[[:punct:]] => Elke printbaar karakter
+[[:space:]] => Eender welk leeg karakter (spaties, tabs, carriage-returns,...)
+~~~
+
+Als we op voorgaand voorbeeld nakijken voor files startende met file maar gevolgd door 1 nummer:
+
+~~~
+student@studentdeb:~$ ls file[[:digit:]]
+file1  file2
+~~~
+
+...of gevolgd door 2 nummers...
+
+~~~
+student@studentdeb:~$ ls file[[:digit:]][[:digit:]]
+file11
+~~~
+
+#### Tilde expansion
+
+We kennen de **tilde** al om te verwijzen de **home-directory**.  
+Je kan dit echter ook om naar de **home-directory** te verwijzen van een **andere user**:
+
+~~~
+student@studentdeb:~$ echo ~root
+/root
+student@studentdeb:~$ echo ~user
+/home/user
+student@studentdeb:~$ echo ~/glob
+/home/user/glob
+$
+~~~
+
+#### Brace expansion
+
+Waar we eerder zagen bij wildcards dat je files kon selecteren je bestaande files kon selecteren, 
+kan je met **brace expansion** nieuwe files (of string genereren)
+
+Door een lijst aan strings tussen braces te plaatsen (zie voorbeeld hieronder) kan je
+verschillende filenames aanmaken met als extensie log.
+
+~~~
+student@studentdeb:~/Tmp/$  echo {Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday}.log
+Sunday.log Monday.log Tuesday.log Wednesday.log Thursday.log Friday.log Saturday.log
+~~~
+
+Deze kan je dan in **combinatie** met **touch** dan gebruiken om **verschillende files te genereren** in een folder
+
+~~~
+student@studentdeb:~/Tmp$ touch {Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday}.log
+student@studentdeb:~/Tmp$ ls
+Sunday.log Monday.log Tuesday.log Wednesday.log Thursday.log Friday.log Saturday.log
+~~~
+
+ipv een lijst kan kan je ook een **sequentie** gebruiken.  
+Bijvoorbeeld **{1..3}** zal **alle getallen van 1 tem 3** voorstellen
+In onderstaand voorbeeld maak je **files** aan **startende** met **"file"** gevolgd door een getal van **1 tem 3**
+
+~~~
+student@studentdeb:~/Tmp$ echo file{1..3}.txt
+file1.txt file2.txt file3.txt
+~~~
+
+Hetzelfde kan je ook met **karakters**:
+
+~~~
+student@studentdeb:~/Tmp$ echo file{a..c}.txt
+filea.txt fileb.txt filec.txt
+~~~
+
+Je kan ook **combineren** van **braces**.  
+In het onderstaand voorbeeld zie je dat alle **combinaties** (2 * 2 = 4) worden gegenereerd:
+
+~~~
+student@studentdeb:~/Tmp$ echo file{a,b}{1,2}.txt
+filea1.txt filea2.txt fileb1.txt fileb2.txt
+~~~
+
+Of zelfs **braces** **embedden** binnen andere **braces**
+
+~~~
+student@studentdeb:~/Tmp$ echo file{a{1,2},b,c}.txt
+filea1.txt filea2.txt fileb.txt filec.txt
+student@studentdeb:~/Tmp$
+~~~
+
+#### Substitution
+
+##### Command substitution
+
+Een andere praktische tool is "command substitution".  
+Dit laat toe om de output van het enen commando te gebruiken binnen een ander commando.
+
+In het onderstaand voorbeeld gebruik ik **2 commando's**:
+
+* **hostname** => naam van de host opvragen
+* **uname** => opvragen van systeem-gegevens
+  
+Zie hieronder als **voorbeeld**:
+
+~~~
+student@studentdeb:~$ hostname -s
+studentdeb
+student@studentdeb:~$ uname -a
+Linux studentdeb 5.10.0-8-amd64 #1 SMP Debian 5.10.46-5 (2021-09-23) x86_64 GNU/Linux
+~~~
+
+De output van deze 2 commando's kan je gebruiken binnen het **echo-commando**
+
+~~~
+student@studentdeb:~$ echo "Deze host is $(hostname -s) met volgende gegevens $(uname -a)"
+Deze host is studentdeb met volgende gegevens Linux studentdeb 5.10.0-8-amd64 #1 SMP Debian 5.10.46-5 (2021-09-23) x86_64 GNU/Linux
+~~~
+
+##### Variable substitution
+
+Je kan - zoals je vrij snel zal zien in scripting - variabele bijhouden binnen.  
+Net zoals bij command substitution kan je deze gebruiken binnen een ander commando (en/string)
+
+~~~
+student@studentdeb:~$ export myhost=$(hostname -s)
+student@studentdeb:~$ echo ${myhost}
+studentdeb
+student@studentdeb:~$ echo "Ik werk op ${myhost}"
+Ik werk op studentdeb
+~~~
+
+Let wel, zowel variable als command substitution werken enkel als je met 
+dubbele quotes werkt.
+
+~~~
+student@studentdeb:~$ echo 'Ik werk op ${myhost}'
+Ik werk op ${myhost}
+~~~
+
+### Bash-scripting
+
+In het volgende deel gaan we commando's die we tot nog toe hebben gezien automatiseren via Bash.  
+Net zoals je op Windows met bat-files scripten kan maken kan je dit op Linux (en Mac) via bash-scripts
+
+Als je een bash-script wil schrijven dient dit altijd te starten met de volgende lijn.
+
+~~~
+#!/bin/bash
+~~~
+
+We noemen dit ook wel een **shebang**, deze bepaalt welke script-interpreter gebruikt wordt.  
+Vervolgens kan je daaronder dan commando's plaatsen, deze zullen dan **sequentieel** worden **uitgevoerd**
+
+~~~
+#!/bin/bash
+echo "Hello World"
+echo "Het is vandaag $(date)"
+~~~
+
+#### Uitvoeren met de bash-interpreter
+
+**Bewaar** dit als **hello.sh** en voer deze uit als **volgt**:
+
+~~~
+student@studentdeb:~$ bash ./hello.sh 
+Hello World
+Het is vandaag Wed 15 Dec 2021 03:24:45 PM CET
+student@studentdeb:~$ 
+~~~
+
+Beide lijnen worden 1 na 1 uitgevoerd???
+
+#### Uitvoeren als programma (en permissies)
+
+Je kan het script ook uitvoeren net zoals je een gewoon programma/commando uitvoert.  
+Om dat te kunnen doen dien je echter nog een extra stap te doen want...
+
+~~~
+student@studentdeb:~$ ./hello.sh
+bash: ./hello.sh: No such file or directory
+student@studentdeb:~$ bash ./hello.sh 
+~~~
+
+...een script wordt by default niet uitvoerbaar gemaakt zoals je hieronder ziet.  
+
+~~~
+student@studentdeb:~$ ls -l ./hello.sh
+-rw-r--r-- 1 student student 61 Dec 15 15:24 ./hello.sh
+~~~
+
+Om het het script zo uit te voeren dien je echter de **permissies** te **wijzigen**:
+
+~~~
+student@studentdeb:~$ chmod u+x hello.sh 
+student@studentdeb:~$ ls -l ./hello.sh
+-rwxr--r-- 1 student student 61 Dec 15 15:24 ./hello.sh
+student@studentdeb:~$ ./hello.sh 
+Hello World
+Het is vandaag Wed 15 Dec 2021 03:28:37 PM CET
+student@studentdeb:~$
+~~~
+
+En kan je het script uitvoeren.
+
+#### Argumenten
+
+Nu we een script kunnen uitvoeren gaan we het concept achter **argumenten** bekijken.  
+Binnen een script kan je naar de argumenten verwijzen.  
+
+Een script zal standaard gevoed worden met **3 vormen** van **argumenten**:
+
+* **$1..n** => de individuele argumenten 
+  (bijvoorbeeld $1 zal het eerste argument tonen, $2 het 2de)
+* **$@** => alle argumenten op een rij
+* **$0** => van het script
+* **$#** => aantal argumenten
+
+Maak bijvoorbeeld een script als volgt:
+
+~~~bash
+#!/bin/bash
+echo "Hello $1 $2"
+~~~
+
+Dit script zal dan de 1ste parameter substitueren binnen de echo.
+
+~~~
+student@studentdeb:~$ chmod u+x a.sh 
+student@studentdeb:~$ ./a.sh 
+Hello  
+student@studentdeb:~$ ./a.sh a
+Hello a 
+student@studentdeb:~$ ./a.sh a b
+Hello a b
+student@studentdeb:~$ ./a.sh a b c
+Hello a b
+student@studentdeb:~$ 
+~~~
+
+#### Condities met if
+
+Bash kan (zoals Python) ook als programmeer- of scripting-taal worden gebruikt.  
+De structuur van een conditie ziet er als volgt uit:
+
+~~~bash
+if [ condition ]
+then
+  command1
+  command2
+  ...
+  commandn
+else
+  command1
+  command2
+  ...
+  commandn
+fi
+~~~
+
+Bijvoorbeeld onderstaande if gaat vergelijken of er argumenten zijn.
+
+~~~bash
+if [ $# -eq 0 ]; then
+        echo Er zijn geen argumenten.
+else
+        echo Er zijn wel argumenten.
+fi
+~~~
+
+##### Testen op getal-waardes
+
+Je kan deze variabelen gaan interpreteren als getallen met de volgende mogelijkheiden:
+
+~~~
+INTEGER1 -eq INTEGER2 => INTEGER1 is numeriek gelijk to INTEGER2
+INTEGER1 -gt INTEGER2 => INTEGER1 is numeriek groter than INTEGER2
+INTEGER1 -lt INTEGER2 => INTEGER1 is numeriek kleiner than INTEGER2
+~~~
+
+met als voorbeelden:
+
+* Testen of een argument groter is dan een getal:
+
+~~~bash
+#!/bin/bash
+# Basic if statement
+if [ $1 -gt 100 ]
+then
+    echo Hey that\'s a large number.
+    pwd
+fi
+~~~
+
+##### Testen op string-waardes
+
+* Testen op basis van het aantal argumenten
+
+~~~
+-n STRING => 	De lengte string > 0.
+-z STRING =>	Het betref een lege string.
+STRING1 = STRING2 => STRING1 is equal to STRING2
+STRING1 != STRING2 =>	STRING1 is not equal to STRING2
+~~~
+
+Voorbeelden:
+
+* Nakijken of de string gelijk is
+
+~~~bash
+#!/bin/bash
+if [ $1 = "go" ]; then
+        echo "go"
+fi
+~~~
+
+~~~bash
+#!/bin/bash
+if [ -n $1 ]; then
+        echo "geen lege string"
+fi
+~~~
+
+##### File-verificaties
+
+Een 3de manier is deze vergelijkingen te maken als zijn het files
+
+~~~
+-e FILE => FILE bestaat.
+-d FILE => FILE bestaat en is een directory.
+-r FILE => FILE bestaat en de read-permissie is toegekend.
+-s FILE => FILE bestaat en is niet leeg.
+-w FILE => FILE bestaat en je mag er naar schrijven.
+-x FILE => FILE bestaat en heeft execute-permissies.
+~~~
+
+Het volgende voorbeeld kijkt na of het argument een file is:
+
+~~~bash
+#!/bin/bash
+if [ $# -eq 0 ]; then
+        echo Er zijn geen argumenten.
+else
+        echo Er zijn $# argumenten.
+        if [ -e $1 ]; then
+                echo Het bestand $1 bestaat.
+        else
+                echo Het bestand $1 bestaat niet.
+        fi
+fi
+~~~
+
+##### Combinaren met && en ||
+
+Je kan (net zoals in Python) ook combinaties maken
+
+~~~
+! EXPRESSION =>	EXPRESSION geinverteerd (false => true)
+&& => en
+|| => of
+~~~
+
+Volgende script gaat het vergelijk maken of een eerste getal 
+tussen de 2 andere argumenten ligt
+
+~~~bash
+if [ $1 -gt $2 ] && [ $1 -lt $3 ]
+then
+        echo "$1 ligt tussen  $a en $b"
+else
+        echo "$1 ligt niet tussen $a en $b"
+fi
+~~~
+
+Met als volgende gebruik:
+
+~~~
+student@studentdeb:~$  ./between.sh 6 5 10
+6 ligt tussen  5 en 10
+student@studentdeb:~$  ./between.sh 4 5 10
+4 ligt niet tussen 5 en 10
+student@studentdeb:~$  
+~~~
+
+#### for loop
+
+De for-loop kan gebruikt worden om door een lijst te lopen
+
+~~~bash
+#!/bin/bash
+for i in 1 2 3 4 5 6 7 8 9 10;
+do
+    echo $i
+done 
+~~~
+
+Deze lijst kan je ook genereren met het commando **seq**  
+
+~~~
+bart@bvlegion:~$ seq 1 10
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+bart@bvlegion:~$
+~~~
+
+en als volgt **toepassen** binnen een **script**
+
+~~~bash
+#!/bin/bash
+for i in $(seq 1 10);
+do
+    echo $i
+done 
+~~~
+
+#### while loop
+
+Een andere loop die gaat testen op een conditie.  
+Deze heeft het volgende **formaat**:
+
+~~~bash
+while [ condition ]
+do
+   command1
+   command2
+   command3
+done
+~~~
+
+Je kan deze bijvoorbeeld gebruiken in **combinatie** met een **teller** en **conditie**:
+
+~~~bash
+#!/bin/bash
+x=1
+while [ $x -le 5 ]
+do
+  echo "Welcome $x times"
+  x=$(( $x + 1 ))
+done
+~~~
+
+Maar ook om een **oneindige loop** aan te maken:
+
+~~~bash
+#!/bin/bash
+while true; do
+    echo "hello"
+    sleep 5
+done
+~~~
+
+#### Inlezen van een variabele met read
+
+Om binnen een script tekst in te lezen gebruik je het commando **read**:
+
+~~~bash
+#!/bin/bash
+echo; echo "Typ een teken, daarna Return."
+read text
+echo $text
+~~~
+
+#### case
+
+**case** kan je gebruiken als **alternatief** op **if** als je exact wil mappen naar een waarde
+en daar 1 of meerder commando's wil op uitvoeren
+
+~~~bash
+#!/bin/bash
+case $var in
+        yes) echo "You entered yes" ;;
+        no) echo "You entered no" ;;
+        quit) echo "You want to quit" ;;
+        *) echo "You types something else" ;;
+esac
+~~~
+
+een krachtigere variant als je de combinatie maakt met de **patterns** en **karakter-klassen** die we eerder vermeldden
+
+~~~bash
+#!/bin/bash
+echo; echo "Typ een teken, daarna Return."
+read Keypress
+case "$Keypress" in
+    [[:lower:]] ) echo "Kleine letter";;
+    [[:upper:]] ) echo "Hoofdletter";;
+    [[:digit:]] ) echo "Cijfer";;
+    * ) echo "Leesteken, spatie of iets anders";;
+esac
+~~~
+
+### Sourcing
+
+Als je een script uitvoert binnen een linux-shell zal dit script niet de huidige shell aanpassen.  
+De shell zal een script binnen een apart process uitvoeren en dan terugkeren naar de huidige shell.
+
+Neem nu volgend script dat als je dat uitvoert naar een directory hoger verhuist:
+
+~~~bash
+#!/bin/bash
+old_directory=$(pwd)
+cd ..
+echo "Moved from $old_directory to $(pwd)"
+~~~
+
+Als je dit script uitvoert zou je **verwachten** dat je een **directory** zou **stijgen**...  
+Zeker als je de **output** van dit script *Moved from /home/bart/Tmp to /home/bart* **bekijkt**:
+
+~~~
+bart@bvlegion:~/Tmp$ chmod u+x up.sh 
+bart@bvlegion:~/Tmp$ pwd
+/home/bart/Tmp
+bart@bvlegion:~/Tmp$ ./up.sh 
+Moved from /home/bart/Tmp to /home/bart
+bart@bvlegion:~/Tmp$ 
+~~~
+
+Maar als het **pwd**-commando gebruikt zie je dat je je nog altijd op **dezelfde** **locatie** bevindt
+
+~~~
+bart@bvlegion:~/Tmp$ pwd
+/home/bart/Tmp
+bart@bvlegion:~/Tmp$
+~~~
+
+Ook de variabele **old_directory** is **nergens** te **bespeuren** (leeg):
+
+~~~
+bart@bvlegion:~/Tmp$ echo $old_directory
+
+bart@bvlegion:~/Tmp$ 
+~~~
+
+Er is echter de mogelijk om dit script **binnen de huidige shell uit te voeren**.  
+Dit principe noemt men sourcing en je kan dit simpel gebruiken door de uitvoering van je script
+te prependen met een **.** of alternatief het keyword **source** zoals je ziet in onderstaand voorbeeld:
+
+~~~
+bart@bvlegion:~/Tmp$ . ./up.sh 
+Moved from /home/bart/Tmp to /home/bart
+bart@bvlegion:~$ 
+~~~
+
+of in de 2de variant
+
+~~~
+bart@bvlegion:~/Tmp$ source ./up.sh 
+Moved from /home/bart/Tmp to /home/bart
+bart@bvlegion:~$ 
+~~~
+
+Je zien al aan de prompt dat de directory is gewijzigd.  
+Het **pwd-commando** hieronder bevestigd dit
+
+~~~
+bart@bvlegion:~$ pwd
+/home/bart
+~~~
+
+Ook zie je dat de variabele **nog altijd zichtbaar** is binnen de console (wat daarvoor niet het geval was)
+
+~~~
+bart@bvlegion:~$ echo $old_directory
+/home/bart/Tmp
+bart@bvlegion:~$ 
+~~~
