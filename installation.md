@@ -498,13 +498,13 @@ volgende commando:
 $ su -
 ~~~
 
-Je maakt een mount-directory aan:
+Je maakt een **mount-directory** aan:
 
 ~~~
 # mkdir -p /mnt/vboxguestadditions
 ~~~
 
-Je mount deze directory tov de guestadditions-cd
+Je **mount** deze **directory** tov de guestadditions-cd
 
 ~~~
 # mount /media/cdrom /mnt/vboxguestadditions
