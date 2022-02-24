@@ -10,3 +10,4 @@ De cursus heeft als doel handigheid op te bouwen in het werken met Linux.
 * Configureren en opzetten een Linux Distributie
 * Navigeren binnen een Linux machine
 * Basis skill om files, directories en users te beheren
+

@@ -6,13 +6,13 @@ Een **"command line"** is een **tekst-georienteerde interface** die kan worden g
 
 De **command-line voor Linux** wordt geleverd door een **toepassing** die we de **shell** wordt genoemd.  
 
-Op je Linux-systeem zal het je toelaten eender welke taak uit te voeren op je computer:
+Op je Linux-systeem zal het je toelaten alle soorten administratie-**taken** uit te voeren op je computer:
 
-* Files en folders te bewerken
-* Je besturingssysteem te configureren
-* Programma's op te starten
-* Met een netwerk te interageren
-* Taken te automatiseren
+* **Files** en **folders** te bewerken
+* Je besturingssysteem te **configureren**
+* **Programma**'s op te **starten**
+* Met een **netwerk** te interageren
+* Taken te **automatiseren**
 * ...
 
 > *Nota*  
@@ -109,12 +109,14 @@ Vervolgens zie je dat je terug 1 user-prompt ziet...
 student@studentdeb:~$ 
 ~~~
 
+Hetzelfde kan je bereiken via de key-combo "Ctrl+L"
+
 #### Commando-Argumenten
 
-Zo'n commando is telkens een programma dat wordt uitgevoerd, zelfs het éénvoudige programma clear dat we zo net hebben gebruikt.
+Zo'n **commando** is telkens een **programma** dat wordt **uitgevoerd**, zelfs het éénvoudige programma clear dat we zo net hebben gebruikt.
 
-Veel van deze programma's hebben echter een argument nodig.  
-Laten we direct een **2de commando** gebruiken, **echo**
+Veel van deze programma's hebben echter een **argument** nodig.  
+Laten we direct illustreren via een **2de commando** gebruiken, **echo**
 
 ~~~
 student@studentdeb:~$ echo hello
