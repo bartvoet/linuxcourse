@@ -604,30 +604,6 @@ Deze **speciale permissies** hebben net zoals de andere permissies een numerieke
 
 Bijvoorbeeld 6775 zal zowel de sgid en suid-bit zetten (6 = 4 + 2) naast de bijhorende standaard permissies
 
-### Default permissies en het umask
-
-#### Default permissies
-
-Op de meeste linux-system zijn de **default permissies**:
-
-* Voor files **0666** of **rw-rw-rw**
-* Voor directries **0777** of **rwxrwxrwx**
-
-#### Default persmissies in praktijk echter...
-
-Als we echter met onze user een lege file en directory creeren...
-
-~~~
-student@studentdeb:~$ ls -ld hello*
-drwxr-xr-x 2 student student 4096 Nov 24 15:57 hello_dir
--rw-r--r-- 1 student student    0 Nov 24 15:57 hello.txt
-~~~
-
-...krijgen we echter:
-
-* **rwxr-xr-x** of **0755** voor een **directory**
-* **rw-r--r--** of **0644** voor een **file**
-
 #### s vs S
 
 Er als je **suid** (op user) of **sgid** (op groep) configureert zie in de output van ls
@@ -661,9 +637,36 @@ student@studentdeb:~$ ls -ld derde
 drwxrwsrwx 2 student student 4096 Nov 24 19:48 derde
 ~~~
 
+### Default permissies en het umask
+
+#### Default permissies
+
+Op de linux-systemen worden **"by default"** zijn de volgende **permissies** toegekend:
+
+* Voor files **0666** of **rw-rw-rw**
+* Voor directries **0777** of **rwxrwxrwx**
+
+#### Default persmissies in praktijk echter...
+
+Als voorbeeld maken we met onze user een lege file en directory aan...  
+We bekijken de permissies van deze nieuwe file en directory...
+
+~~~
+student@studentdeb:~$ ls -ld hello*
+drwxr-xr-x 2 student student 4096 Nov 24 15:57 hello_dir
+-rw-r--r-- 1 student student    0 Nov 24 15:57 hello.txt
+~~~
+
+...en zien:
+
+* **rwxr-xr-x** of **0755** voor een **directory**
+* **rw-r--r--** of **0644** voor een **file**
+
+Hoe komt dat deze permissies niet 666 en 777 zijn?
+
 #### umask
 
-Dit komt echter door de **umask** dit is een waarde die wordt ingeladen **per shell-sessie** die er voor zorgt dat deze waarde wordt aangepast...
+Dit komt door de **umask** dit is, een waarde die wordt ingeladen **per shell-sessie** en er voor zorgt dat deze waarde wordt aangepast...
 
 Deze waarde kan je opvragen via het **commando umask**:
 
@@ -673,13 +676,14 @@ student@studentdeb:~$ umask
 student@studentdeb:~$ 
 ~~~
 
-De waarde is 0022 en stelt een octale waarde die volgens de zelfde logica or encodering werkt zoals bij de permissies.  
-Deze waarde 0022 wijzigt echter de permissies die standaard worden toegekend door deze in mindering te brengen van de eedere vermelde default permissies
+Deze waarde is **0022** en stelt een **octale** **waarde** voor en wordt **toegepast** op de **permissies**.  
 
-* **0777** - **0022** wordt dan **0755** voor een **directory**
-* **0666** - **0022** wordt dan **0644** voor een **file**
+In eerder voorbeeld zien we dat:
 
-Dus de echte default permissies worden meebepaald door deze umask-waarde
+* **0777** en **0022** gecombineerd wortd **0755** voor de **directory**
+* **0666** en **0022** gecombineerd wordt **0644** voor een **file**
+
+De feitelijke permissies worden meebepaald door deze umask-waarde
 
 ~~~
 student@studentdeb:~$ umask
@@ -689,26 +693,79 @@ drwxr-xr-x 2 student student 4096 Nov 24 15:57 hello_dir
 -rw-r--r-- 1 student student    0 Nov 24 15:57 hello.txt
 ~~~
 
-#### umask wijzigen
+#### umask-mechanisme (modbit-niveau)
 
-Je kan echter deze umask-waarde binnen je sessie wijzigen (wordt niet opgeslagen).  
-Stel dat je nu deze umask wijzigt naar 0026...
+Je zou - adhv het vorige voorbeeld - kunnen denken dat het toepassen dat
+deze **umask** gewoon gebeurt door deze **umask-waarde** **af te trekken** van de 
+**default permissies**.  
+
+Is dit zo?  
+Als we van de **assumptie** zouden uitgaan dan je **023** van **666** zou aftrekken dan kom je op **643** moeten uitkomen.  
+
+Laten we de **proef op de som** nemen, je **kan** namelijk via het **umask**-commando deze **waarde wijzigen**, dit geldt wel enkel voor je bash-sessie... (als je een nieuwe sessie start wordt deze terug naar de geconfigureerde systeem-waarde gezet).  
+Stel nu we wijzigen **022** naar **023**
 
 ~~~
-student@studentdeb:~$ umask 0026
+student@studentdeb:~$ umask
+0002
+student@studentdeb:~$ umask 0023
+student@studentdeb:~$ umask
+0023
 ~~~
 
-...en je maakt een nieuwe file en directory aan 
+Vervolgens maken we een **nieuwe file** aan (via touch) en **bekijken** we de **permissies**.
 
 ~~~
-student@studentdeb:~$ touch hello2
-student@studentdeb:~$ mkdir hello2_dir
-student@studentdeb:~$ ls -ld hello2*
--rw-r----- 1 student student    0 Nov 24 16:13 hello2
-drwxr-x--x 2 student student 4096 Nov 24 16:13 hello2_dir
+student@studentdeb:~$ touch umasktest
+student@studentdeb:~$ ls -l umasktest 
+-rw-r--r-- 1 student student 0 Mar 20 21:10 umasktest
+student@studentdeb:~$ 
 ~~~
 
-Worden de rechten voor zowen read als write (6 = 4 + 2) 
+Wat maken we hier uit op?  
+We zien dat de modbits **niet 623** (rw-r---wx) zijn maar **644** (rw-r--r--) zijn.  
+
+Hebben we hier **verkeerd** **geteld**?  
+**Neen**, de eigenlijke bewerking is **geen verschil** van de **permissies** en de **umask**-waarde.
+
+Je moet dit het **umask** **eerder** bekijken als een **soort van masker** bekijken met de volgende regels:
+
+* Elke **modbit** (rwx) van de **originale** **permissie** wordt **vergeleken** met dezelfde **modbit** (po(rwx) binnen de **umask**
+* Is de **overeenkomstige** **modbit** binnen de **umask** **0** **behouden** we de originele **modbit** in de **permissie**
+* Staat deze echter modbit op **1** wordt deze bitmask automatisch **geforceerd** op **0** geplaatst
+
+Zie voor de toepassing naar onderstaande vergelijking:
+
+~~~
+       GETALLEN    
+       rwx rwx rwx
+666 => 420 420 420
+023 => 000 020 021
+       -----x---x-
+644 <= 420 400 400
+~~~
+
+De waarde is nu 644 ipv 643 omdat modbits die echter al op 0 stonden (zoals de x-modbit voor others) 0 blijven.  
+Als gevolg zal 023 en 022 geen verschil uit maken voor files gezien de x-bit automatisch reeds uit staat.
+
+Op niveau van bit-operaties (boolean algebra) wordt er een &-operatie uitgevoerd gecombineerd met een inversie...
+
+~~~
+       GETALLEN       BITS
+       rwx rwx rwx    rwx rwx rwx
+666 => 420 420 420 => 110 110 110
+023 => 000 020 021 => 111 101 100 (~000 000 010)
+       -----x---x-  & -----------
+644 <= 420 400 400 <= 110 100 100
+~~~
+
+In code (c-code bijvoorbeeld) zou je dit als volgt kunnen uitdrukken:
+
+~~~c
+default_permissie = 666;
+umask = 023;
+permissie = default_permissie & ~(umask);
+~~~
 
 ### Oefening
 

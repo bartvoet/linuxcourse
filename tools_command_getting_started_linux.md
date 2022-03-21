@@ -851,15 +851,15 @@ drwxr-xr-x 3 student student 4096 Oct 13 14:08 Documents
 student@studentdeb:~$ 
 ~~~
 
-### Shell-variabelen
+### Shell vs environment-variabelen
 
 Een shell laat toe om - zoals in een programmmeer-taal - variabelen aan te maken en te gebruiken.
 
-#### Een environment-variabele definieren
+#### Een shell-variabele definieren
 
-Een environment-variabele is een variabele (eigenlijk een stuk tekst) die door de shell wordt bijgehouden gedurende de terminal-sessie.  
+Een shell-variabele is een **variabele** (eigenlijk een stuk tekst) die door de **shell** wordt **bijgehouden** gedurende de terminal-sessie.  
 
-Het volgende voorbeeld gebruikt bijvoorbeeld dit mechanisme om een het path naar je project bij te houden
+Het volgende **voorbeeld** gebruikt bijvoorbeeld dit mechanisme om een het **path** naar een **folder** bij te houden
 
 ~~~
 student@studentdeb:~$ MY_DATA_FOLDER=/home/student/Documents
@@ -878,27 +878,165 @@ student@studentdeb:~/Documents$
 
 > **Let op**, als deze variabele al bestaat dan wordt deze overschreven
 
-#### Systeem-variabelen
+#### Environment-variabelen
 
-Naast je eigen variabelen houdt je operating systeem ook een aantal variabelen bij.  
+Een **shell-variabele** zal **enkel** **zichtbaar** zijn binnen de **shell** zelf.  
+Vanaf de moment dat je een nieuwe shell start zal deze niet meer zichtbaar zijn.
 
-~~~bash
-student@studentdeb:~$ cd een_directory_die_niet_bestaat
-student@studentdeb:~$ echo $?
-1
-student@studentdeb:~$ cd Documents/
-student@studentdeb:~/Documents$ echo $?
-0
+Je kan echter zo'n shell-variabele "promoten" naar een environment-variabele toe, hiervoor gebruiken we het **commando export**
+
+In onderstaand voorbeeld:
+
+* Maken we een variabele some_var aan
+* Printen we deze
+* Openen een nieuwe bash-sessie
+* Printen we deze opnieuw
+
+~~~
+student@studentdeb:~$ some_var="hello world"
+student@studentdeb:~$ echo $some_var 
+hello world
+student@studentdeb:~$ bash
+student@studentdeb:~$ echo $some_var
+
+student@studentdeb:~$ exit
+student@studentdeb:~$ echo $some_var 
+hello world
 ~~~
 
-Deze variabele $? zal de error-code bijhouden die door het laatste programma was teruggegeven aan de shell.  
+We zien echter dat deze **variabele** **niet** meer **zichtbaar** is binnen de nieuwe sessie.   
+Dit is normaal gezien een **shell-variabele verbonden** is aan **1** enkele **shell-sessie**.
 
-### Alle environment-variabelen zien
+Als je daarentegen **export** gebruikt zal deze zichtbaar zijn in alle shells en andere programma's die je start.
+
+~~~
+student@studentdeb:~$ export some_var="hello world"
+student@studentdeb:~$ bash
+student@studentdeb:~$ echo $some_var 
+hello world
+student@studentdeb:~$ 
+~~~
+
+Hetzelfde kunnen we ook **demonstreren** via een **shellscript**.  
+Gegeven het onderstaande shellscript print_some_var.sh dat de inhoud van een variabele **some_var** zal afprinten.
+
+~~~
+student@studentdeb:~$ cat print_some_var.sh 
+echo $some_var
+~~~
+
+Als je een **bash-script** of een **programma** start vanuit de shell zie je **hetzelfde effect**.
+
+In onderstaand voorbeeld maken we opnieuw de shell-variabele aan.  
+Zoals je ziet zal deze echter **niet zichtbaar** zijn voor het script (om dezelfde reden als voorgaand voorbeeld).  
+
+~~~
+student@studentdeb:~$ some_var="hello world"
+student@studentdeb:~$ echo $some_var 
+hello world
+student@studentdeb:~$ bash print_some_var.sh 
+student@studentdeb:~$
+~~~
+
+In geval je **some_var** niet **"export"** zal het script (apart proces) de variabele niet terugvinden (en kunnen printen).
+
+Als je vervolgens echter de variabele "**export**" zal deze zichtbaar zijn voor programma's die je start vanuit die shell.
+
+~~~
+student@studentdeb:~$ export some_var
+student@studentdeb:~$ bash print_some_var.sh 
+hello world
+~~~
+
+#### Systeem-variabelen
+
+We kennen ondertussen het **verschil** tussen **shell-** en **environment-variabelen**.
+
+Naast je eigen variabelen zorgt je OS- en user-config ook voor een aantal environment-variabelen bij.  
+
+##### PATH
+
+Om een programma uit te voeren binnen linux moet je altijd het **exacte path** voorzien.  
+Je kan bijvoorbeeld niet een **script** uitvoeren dat binnen **dezelfde directory** staat door de **naam** te typen.
+
+Als je bijvoorbeeld voorgaand script wil uitvoeren als programma (zonder bash voor te zetten) moet je **./** er voorplaatsen om de exacte locatie aan te geven (**./** is je **workdirectory**)
+
+~~~
+student@studentdeb:~$ ls -l print_some_var.sh 
+-rwxr--r-- 1 student student 15 Mar  7 11:25 print_some_var.sh
+student@studentdeb:~$ print_some_var.sh 
+bash: print_some_var.sh: command not found
+student@studentdeb:~$ ./print_some_var.sh 
+test
+student@studentdeb:~$ 
+~~~
+
+Er is echter een **uitzondering** op deze regel.  
+Je systeem/shell voorziet echter een systeem (environment-)variabele **PATH**, deze bevat een **lijst** van alle **locaties** waar je shell **uitvoerbare programma's** kan gaan **zoeken**.
+
+~~~
+student@studentdeb:~$ echo $PATH
+/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
+student@studentdeb:~$
+~~~
+
+Als je in één van deze directories gaat kijken zal je zien
+dat veel executables die je reeds gebruikt te vinden zijn.
+
+Als we bijvoorbeeld kijken naar waar ls zich bevindt...
+
+~~~
+student@studentdeb:~$ ls /usr/bin/ls*
+/usr/bin/ls           /usr/bin/lscpu        /usr/bin/lslogins  /usr/bin/lsof
+/usr/bin/lsattr       /usr/bin/lsinitramfs  /usr/bin/lsmem     /usr/bin/lspci
+/usr/bin/lsblk        /usr/bin/lsipc        /usr/bin/lsmod     /usr/bin/lspgpot
+/usr/bin/lsb_release  /usr/bin/lslocks      /usr/bin/lsns      /usr/bin/lsusb
+~~~
+
+Als je bijvoorbeeld wilt dat een directory aan dat zoek-pad wordt toegevoegd kan je deze **PATH-variabele** wijzigen.  
+In **onderstaand voorbeeld** **vindt** de shell **geen** print_some_var.sh-**script terug** ondanks het feit dat deze in dezelfde directory staat.
+
+~~~
+student@studentdeb:~$ ls print_some_var.sh
+print_some_var.sh
+student@studentdeb:~$ print_some_var.sh
+bash: print_some_var.sh: command not found
+student@studentdeb:~$ echo $PATH 
+/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
+~~~
+
+Als je echter je huidge workdirectory toevoegt aan het PATH...
+
+~~~
+student@studentdeb:~$ export PATH=/home/student/:$PATH
+student@studentdeb:~$ echo $PATH
+/home/student/:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
+~~~
+
+...ga je zien dat het script wordt herkend door de tab-completion...
+
+~~~
+student@studentdeb:~$ pr
+pr                 prezip             printf             prtstat
+precat             prezip-bin         print_some_var.sh  
+preconv            print              prlimit            
+preunzip           printenv           prove              
+~~~
+
+...en het script kan uitvoeren zonder de locatie aan te duiden
+
+~~~
+student@studentdeb:~$ print_some_var.sh 
+test
+student@studentdeb:~$ 
+~~~
+
+#### Alle environment-variabelen zien
 
 Als je alle variabelen willen zien moet je gewoon het commando printenv typen
 
 ~~~
-bart@bvpers4 ~/mijn_eerste_programma $ printenv
+student@studentdeb:~/mijn_eerste_programma$ printenv
 LC_PAPER=de_BE.UTF-8
 XDG_VTNR=8
 SSH_AGENT_PID=2713
@@ -912,3 +1050,652 @@ GPG_AGENT_INFO=/home/bart/.gnupg/S.gpg-agent:0:1
 TERM=xterm-256color
 ...
 ~~~
+
+### String-demarcatie
+
+Als je aan een commando **tekst** meegeeft gescheiden door **whitespace** zullen deze aan de applicaties worden meegeven als aparte argumenten.
+
+Stel het onderstaande **commando/voorbeeld** worden er **3 verschillende** (mogelijke) **filenames** meegegeven.  
+Het ls-commando zal als gevolg antwoord geven voor 3 verschillende filenames (die in dit geval niet bestaan).
+
+~~~~
+student@studentdeb:~$  ls niet bestaande file
+ls: cannot access 'niet': No such file or directory
+ls: cannot access 'bestaande': No such file or directory
+ls: cannot access 'file': No such file or directory
+$student@studentdeb:~$  
+~~~~
+
+Stel dat je een **filename/text** wil meegeven die **whitespace** bevat kan je de string **demarkeren** met **quotes** (```"tekst"```)zoals hieronder geillustreerd.
+
+~~~~
+student@studentdeb:~$  ls "niet bestaande file"
+ls: cannot access 'niet bestaande file': No such file or directory
+~~~~
+
+Naast een dubbele quote (```"tekst"```) kan je ook een single quote (```'tekst'```) gebruiken.
+
+~~~~
+student@studentdeb:~$  ls 'niet bestaande file'
+ls: cannot access 'niet bestaande file': No such file or directory
+student@studentdeb:~$  
+~~~~
+
+**Single** en **double** quotes hebben echter wel een **verschil** in **gedrag**...
+
+#### Variable-substution binnen strings
+
+Dit **verschil** komt naar voren bij het gebruik van **variable-substitution**  
+Als je een shell-variabele declareert kan je deze integreren binnen een string als hieronder geillustreerd.
+
+~~~
+test=hello
+student@studentdeb:~$  echo "$test world"
+hello world
+~~~
+
+Als je echter **single quotes** gebruikt zal deze variabelen **niet** **gesubstitueerd** worden
+
+~~~
+student@studentdeb:~$  echo '$test world'
+$test world
+~~~
+
+### Bash-scripting (deel 1)
+
+Tot nog toe hebben we altijd **interactief** gewerkt met Bash.  
+Je
+
+* typt een **commando** na de prompt
+* Bash **voert** dit commando **uit** (als je enter hebt gedrukt)
+* En **print** de **output** van dit **commando** uit
+
+Een **2de modus** waar je met een shell kan werken is **scripting**.  
+Binnen een script kan je 1 of meerdere commando's bundelen en deze kan je dan in 1 maal uitvoeren.
+
+#### shebang
+
+Als je een **Bash-script** wil schrijven dient dit altijd te **starten** met de **volgende lijn**.
+
+~~~
+#!/bin/bash
+~~~
+
+We noemen het symbool **```#!```** ook wel een **shebang**, deze bepaalt **welke script-interpreter** gebruikt wordt.  
+Vervolgens kan je daaronder dan commando's plaatsen, deze zullen dan **sequentieel** worden **uitgevoerd**
+
+~~~bash
+#!/bin/bash
+echo "Hello World"
+echo "Het is vandaag $(date)"
+~~~
+
+#### Commentaar
+
+Naast het shebang-karakter kan je ook het hash-karakter of **```#```** gebruiken als een comment-teken (zoals in Python).  
+Alles wat je dan schrijft achter dit karakter (op dezelfde lijn) zal dan niet geinterpreteerd worden door de bash-interpreter.
+
+~~~bash
+#!/bin/bash
+#1ste commando...
+echo "Hello World"
+#2de commando
+echo "Het is vandaag $(date)"
+~~~
+
+#### Uitvoeren met de bash-interpreter
+
+**Bewaar** dit als **hello.sh** en voer deze uit als **volgt**:
+
+~~~
+student@studentdeb:~$ bash ./hello.sh 
+Hello World
+Het is vandaag Wed 15 Dec 2021 03:24:45 PM CET
+student@studentdeb:~$ 
+~~~
+
+Beide lijnen worden 1 na 1 uitgevoerd???
+
+#### Uitvoeren als programma (en permissies)
+
+Je kan het **script** ook **uitvoeren** net zoals je een gewoon **programma/commando** uitvoert.  
+Om dat te kunnen doen dien je echter nog een extra stap te doen want...
+
+~~~
+student@studentdeb:~$ ./hello.sh
+bash: ./hello.sh: No such file or directory
+student@studentdeb:~$ bash ./hello.sh 
+~~~
+
+...een **script** wordt **by default niet uitvoerbaar** gemaakt zoals je hieronder ziet.  
+
+~~~
+student@studentdeb:~$ ls -l ./hello.sh
+-rw-r--r-- 1 student student 61 Dec 15 15:24 ./hello.sh
+~~~
+
+Om het het script zo uit te voeren dien je echter de **permissies** te **wijzigen** dit doe je met het **chmod-commando**:
+
+~~~
+student@studentdeb:~$ chmod u+x hello.sh
+student@studentdeb:~$ ls -l ./hello.sh
+-rwxr--r-- 1 student student 61 Dec 15 15:24 ./hello.sh
+student@studentdeb:~$
+~~~
+
+ls -l toont dat je het script nu kan uitvoeren door de x (in rwx) en dus **kan** je het En kan je het script uitvoeren. uitvoeren.
+
+> *Geduld:*
+> De **uitleg** rond **permissies** **volgt** in het hoofdstuk rond permissies...
+
+~~~
+student@studentdeb:~$ ls -l ./hello.sh
+-rwxr--r-- 1 student student 61 Dec 15 15:24 ./hello.sh
+student@studentdeb:~$ ./hello.sh 
+Hello World
+Het is vandaag Wed 15 Dec 2021 03:28:37 PM CET
+student@studentdeb:~$
+~~~
+
+#### Argumenten
+
+Je kan aan zo'n **script** ook **argumenten** meegeven van buitenaf (net zoals we dit eerder bij programma's hebben gezien).  
+Binnen dat script kan je naar deze argumenten verwijzen via een **$** gevolgd door het postitionele nummer van het argument
+
+* Het **1ste** argument kan je via **$1** bereiken
+* Het 2de via **$2**
+* Het 3de via **$3**
+* ...
+
+Als je bijvoorbeeld een script maakt als volgt:
+
+~~~bash
+#!/bin/bash
+
+echo "Hello $1 $2"
+~~~
+
+Dit script zal dan de 1ste en 2de parameter afdrukken met het echo-commando (adhv string-substitutie).
+
+~~~
+student@studentdeb:~$ chmod u+x a.sh 
+student@studentdeb:~$ ./a.sh 
+Hello  
+student@studentdeb:~$ ./a.sh a
+Hello a 
+student@studentdeb:~$ ./a.sh a b
+Hello a b
+student@studentdeb:~$ ./a.sh a b c
+Hello a b
+student@studentdeb:~$ 
+~~~
+
+#### Speciale argumenten
+
+Naast deze argumenten heb je nog een aantal andere speciale variabelen tot je beschikking:
+
+* **$0** => de naam van het script
+* **$#** => aantal argumenten
+* **$@** => alle argumenten op een rij
+* **$```*```** => alle argumenten op een rij als 1 string
+
+Als we deze toevoegen aan voorgaand script...
+
+~~~bash
+#!/bin/bash
+
+echo "Hello $1 $2"
+echo $0
+echo $#
+echo $@
+echo $*
+~~~
+
+... en uitvoert als hieronder
+
+~~~
+student@studentdeb:~$ $ bash ./hello.sh 1 2 3 4
+Hello 1 2
+./hello.sh
+4
+1 2 3 4
+1 2 3 4
+student@studentdeb:~$ 
+~~~
+
+... zien we (na de output van het vorige voorbeeld):
+
+* $0 => ./hello.sh:  
+  De naam van het script (./hello.sh) zelf word als argument 0 meegegeven
+* $```#``` => 1:  
+  Gevolgd door het aantal elementen (4)
+* $```@``` => 1 2 3 4:  
+  Alle argumenten die aan het script zijn meegegeven (als array)
+* $```*``` => 1:  
+  Alle argumenten die aan het script zijn meegegeven (als string)
+
+#### Verschil tussen $```@``` en $```*```
+
+Beide $@ en $```*``` zullen alle argumenten opleveren die worden meegegeven aan het script (startende van $1).
+
+Het verschil ligt echter in de details:
+
+* **$```*```** zal deze argumenten voorzien als **1 string**
+* **$```@```** daarentegen zal deze argumenten als **array** voorzien
+
+De laatste zal dus gebruikt worden binnen scripten om bijvoorbeeld door de verschillende argumenten te loopen.  
+Hier komen we later nog op terug.
+
+Bij ander (niet-script) gebruik zie je verschil enkel als je aan **variable-substitution** doet.  
+Als voorbeeld het onderstaande script dat een ls toepast op alle argumenten:
+
+* Bij de 1ste ls gebruken we de array af
+* Bij de 2de ls de string-notatie
+
+~~~bash
+#!/bin/bash
+
+echo "test 1:"
+ls "$@"
+echo "test 2:"
+ls "$*"
+~~~
+
+Als je dan de output bestudeert:
+
+* **$@** zal **substitueren** naar **3** aparte **argumenten**
+* **$```*```** zal substitueren naar **1 string**
+
+~~~
+$ bash ls_test.sh a b c
+test 1:
+ls: cannot access 'a': No such file or directory
+ls: cannot access 'b': No such file or directory
+ls: cannot access 'c': No such file or directory
+test 2:
+ls: cannot access 'a b c': No such file or directory
+~~~
+
+### In- en output van programma's
+
+Programma's en scripts hebben meestal in- en output nodig op te kunnen werken.  
+Op de command-line zijn er 3 belangrijke elementen
+
+* Input bij de **start** van het **programma**: **argumenten**
+* In- en output tijdens de **uitvoering** van het programma: **STDIN, STDOUT en STDERR**
+* Output bij het einde van het programma
+
+~~~
+START PROGRAMMA:       argumenten   
+                           |
+                           V                        (1)
+(0)                 +------+-----+----> standard output
+standard input ---->|  processs  |  
+                    +------+-----+---->  standard error
+                           |                        (2)
+                           V
+EINDE PROGRAMMA:       exit-code    
+~~~
+
+#### Input bij de start: argumenten (en opties)
+
+Het eerste element hebben we al een aantal maal toegepast bij het gebruiken van diverse commando's.  
+Als je en programma aanroept kan je daar namelijk een aantal extra argumenten aan toevoegen.
+
+~~~
+START PROGRAMMA:       argumenten   
+                           |
+                           V      
+                    +------+-----+
+                    |  processs  |  
+                    +------+-----+
+~~~
+
+Een voorbeeld:
+
+~~~
+student@studentdeb:~$ ls -l hello.sh 
+-rwxr--r-- 1 student student 60 Mar 13 20:04 hello.sh
+student@studentdeb:~$
+~~~
+
+In dit geval is "-l" en "hello.sh" beide argumenten.  
+
+* "-l" in dit geval is optie (een speciaal soort argument voorafgegaan door een koppelteken)
+* "hello.sh" als 2de (en eigenlijk) argument
+
+#### Output bij het einde van het programma: Exit-code
+
+Voorgaande was bij de **start** van het programma om eventuele parameter of argumenten door te geven.  
+
+~~~
+START PROGRAMMA:       argumenten   
+                           |
+                           V      
+                    +------+-----+
+                    |  processs  |  
+                    +------+-----+
+                           |
+                           V
+EINDE PROGRAMMA:       exit-code    
+~~~
+
+Elke applicatie (binnen linux) zal bij het beeindigen van het programma een code teruggeven.  
+Deze code noemen we ook exit-code en heeft als bedoeling informatie mee te geven over het al dan niet successvol uitvoeren van het commando.
+
+Deze commando kan je vanuit de shell opvragen via een speciale variable **$?**.  
+Bij normale uitvoering  - **zonder error** of **warnings** - zal deze waarde (bij conventie) **0** zijn.
+
+~~~
+student@studentdeb:~$ ls -l hello.sh 
+-rwxr--r-- 1 student student 60 Mar 13 20:04 hello.sh
+student@studentdeb:~$ echo $?
+0
+~~~
+
+Als we echter een **foutje** maken bij de uitvoering zal de applicatie (bij conventie) een code opwerpen **verschillend** van **0**  
+In onderstaand voorbeeld geven we de naam van een nieu bestaand bestand door aan ls waarop dat deze een exit-code 2 opwerpt.
+
+~~~
+student@studentdeb:~$ ls -l hello.sh.not 
+ls: cannot access 'hello.sh.not': No such file or directory
+student@studentdeb:~$ echo $?
+2
+student@studentdeb:~$
+~~~
+
+Deze code is niet voor elke commando (of zelfs fout binnen een commando) identiek.  
+Het 2de voorbeeld - cd naar een niet bestaande directory - bevestigd dit...
+
+~~~
+student@studentdeb:~$ cd bestaatniet
+bash: cd: bestaatniet: No such file or directory
+student@studentdeb:~$ echo $?
+1
+student@studentdeb:~$ echo $?
+0
+student@studentdeb:~$ 
+~~~
+
+Laatste belangrijke bemerking is dat deze code altijd wordt overschreven, het bevat enkel de exit-code van het laatste commando (ongeacth of deze 0 of verschillend is).  
+Bij het volgende commando zal deze terug worden overschreven, in bovenstaand voorbeeld zal de echo zelf de exit-code terug op 0 zetten.
+
+> Nota: als je gewoon een enter drukt zal deze exit-code niet worden overschreven omdat er geen applicatie of commando is uitgevoerd
+
+##### exit-code bij scripts
+
+Vanuit een script kan je trouwens ook de exit-code bepalen.  
+Dat kan je via het commando exit gevolgd door een integer (geheel getal)
+
+~~~bash
+#!/bin/bash
+
+echo "Hello exit-demo"
+exit 25
+~~~
+
+Als je dit uitprobeert zie ja dat er inderdaad 25 door het script wordt doorgegeven.
+
+~~~
+student@studentdeb:~$ ./exit_code_demo.sh
+Hello exit-demo
+student@studentdeb:~$ echo $?
+25
+student@studentdeb:~$ 
+~~~
+
+#### Tijdens de uitvoering: stdin, stdout en stderr
+
+Een proces binnen een Linux-distro (maar ook UNIX- en ander POSIX-compliant OS)
+heeft altijd automatich **3 files** of **streams** ter beschikking
+
+* **STDIN**: standard input
+* **STDOUT**: standard output
+* **STDERR**: standard error
+
+Dit zijn datastromen die je een applicatie **"standaard"** zal **doorgeven** (STDOUT en STDERR) aan de **shell**.  
+Vanuit de shell echter kan je deze **datastromen** doorgeven aan **andere** **applicaties** via een aantal operatoren (>, >>, <, |)
+
+##### STDOUT
+
+De eerste is STDOUT, dit is de tekst/output dat je applicatie produceert
+
+~~~
+START PROGRAMMA:       argumenten   
+                           |
+                           V                        (1)
+                    +------+-----+----> standard output
+                    |  processs  |  
+                    +------+-----+
+                           |
+                           V
+EINDE PROGRAMMA:       exit-code    
+~~~
+
+In onderstaand voorbeeld zal de standard-output van het commando "ls" naar de shell doorsturen
+
+~~~
+student@studentdeb:~$ ls -l hello.sh 
+-rwxr--r-- 1 student student 60 Mar 13 20:04 hello.sh
+student@studentdeb:~$
+~~~
+
+##### Redirection operator > (overwrite)
+
+Deze output kan je echter "redirect"-en naar een een file.  
+Dit doe je door na het commando een **```>```** teken te plaatsen gevolgd naar welk file je wil schrijven zoals hieronder geillustreerd.
+
+~~~
+student@studentdeb:~$ ls -l hello.sh > lsout
+student@studentdeb:~$ cat lsout
+-rwxr--r-- 1 student student 60 Mar 13 20:04 hello.sh
+student@studentdeb:~$
+~~~
+
+Een 2de voorbeeld is als je een file wil aanmaken met reeds wat tekst in:
+
+~~~
+student@studentdeb:~$ echo "Hello World" > helloworld 
+student@studentdeb:~$ cat helloworld
+Hello world
+student@studentdeb:~$
+~~~
+
+##### Redirection operator >> (append)
+
+De >-operator zal een file overschrijven, al er reeds een file bestaat zal deze worden overschreven met de volledige output van het commando.
+
+~~~
+student@studentdeb:~$ ls -l hello.sh > lsout
+student@studentdeb:~$ cat lsout
+-rwxr--r-- 1 student student 60 Mar 13 20:04 hello.sh
+student@studentdeb:~$ 
+~~~
+
+Als je echter het bestand niet wil overschrijven gebruik je de **>>-redirection-operator**.  
+Om te vermijden dat we voorgaande input niet overschrijven gebruiken we deze operator.
+
+~~~
+tudent@studentdeb:~$ ls -l hello.sh >> lsout
+student@studentdeb:~$ ls -l hello.sh >> lsout
+student@studentdeb:~$ cat lsout
+-rwxr--r-- 1 student student 60 Mar 13 20:04 hello.sh
+-rwxr--r-- 1 student student 60 Mar 13 20:04 hello.sh
+-rwxr--r-- 1 student student 60 Mar 13 20:04 hello.sh
+student@studentdeb:~$ 
+~~~
+
+Als gevolg hiervan zien we dat de file is aangevuld...
+
+##### STDERR
+
+Naast **STDOUT** is er echter nog een **2de** output-stream, namelijk **STDERR**.  
+
+~~~
+START PROGRAMMA:       argumenten   
+                           |
+                           V                        (1)
+                    +------+-----+----> standard output
+                    |  processs  |  
+                    +------+-----+---->  standard error 
+                           |                        (2)
+                           V
+EINDE PROGRAMMA:       exit-code    
+~~~
+
+Een **applicatie** zal **foutboodschappen** doorsturen naar de **STDERR**, niet naar **STDOUT**.
+Bij volgende voorbeeld proberen we express een nietbestaande file op te lijsten en de outputweg te schrijven naar een file.
+
+~~~
+student@studentdeb:~$ ls -l hello.sh.not > lsout
+ls: cannot access 'hello.sh.not': No such file or directory
+student@studentdeb:~$ cat lsout 
+student@studentdeb:~$ 
+~~~
+
+Hier zien we dat de **file leeg** is, dit is omdat de enige output van het ls-commando de foutboodschap was die je op de console zag verschijnen.  
+
+##### Redirect van STDERR via 2>
+
+Als je er echter wil voor zorgen dat de **error-output** naar een file wordt weggeschreven kan je dit door een nummer toe te voegen aan het redirect-symbool, voor de **error-stream** is dit altijd **2**
+
+~~~
+student@studentdeb:~$ ls -l hello.sh.not 2> lserr
+student@studentdeb:~$ cat lserr 
+ls: cannot access 'hello.sh.not': No such file or directory
+student@studentdeb:~$ 
+~~~
+
+Je kan ook zorgen dat **beide** streams **tegelijkertijd** worden weggeschreven.  
+In onderstaand voorbeeld:
+
+* lijsten zowel een bestaande als niet bestaande file op
+* de error-output gaat naar lserr
+* de gewone output gaat naar lsout 
+
+~~~
+student@studentdeb:~$ ls -l hello.sh hello.sh.not >lsout 2> lserr
+student@studentdeb:~$ cat lserr 
+ls: cannot access 'hello.sh.not': No such file or directory
+student@studentdeb:~$ cat lsout
+-rwxr--r-- 1 student student 60 Mar 13 20:04 hello.sh
+student@studentdeb:~$ 
+~~~
+
+##### Redirect van beide STDOUT en STDERR via &>
+
+Als je beide tegelijkertijd will redirecten en je **&>** gebruiken in de plaats hiervan.  
+In het **voorbeeld** hieronder zullen **beide streams** naar **lsall** worden weggeschreven.
+
+~~~
+student@studentdeb:~$ ls -l hello.sh hello.sh.not &> lsall
+student@studentdeb:~$ cat lsout 
+-rwxr--r-- 1 student student 60 Mar 13 20:04 hello.sh
+ls: cannot access 'hello.sh.not': No such file or directory
+student@studentdeb:~$ 
+~~~
+
+##### STDIN
+
+Een 3de stream is STDIN, dit is de standaard input die een applicatie meekrijgt vanaf de shell.
+
+~~~
+START PROGRAMMA:       argumenten   
+                           |
+                           V                        (1)
+(0)                 +------+-----+----> standard output
+standard input ---->|  processs  |  
+                    +------+-----+---->  standard error
+                           |                        (2)
+                           V
+EINDE PROGRAMMA:       exit-code    
+~~~
+
+Om dit de demonstreren gebruiken we het **commando wc**.  
+wc is de afkorting voor **wordcount** en geeft (standaard zonder argumenten) 3 outputs:
+
+* Aantal lijnen
+* Aantal woorden
+* Aantal karakters
+
+Als je dit commando uitvoert zonder argumenten zal dit commando wachten op input van de console,
+namelijk STDIN.  
+In onderstaand voorbeeld typen we wat tekst gevolgd, om deze tekst (STDIN) te beeindigen gebruiken we "Ctrl + D"
+
+~~~
+student@studentdeb:~$ wc
+hello
+world
+greetings from the shell
+      3       6      37
+student@studentdeb:~$ 
+~~~
+
+##### Redirection vanuit een file naar STDIN via <
+
+Net als we met > naar een file kunnen afleiden, kunnen we inhoud van een file afleiden naar STDIN.  
+Dit kunnen we via de operator **<**.
+
+We komen terug op ons voorgaand voorbeeld waar we een file aanmaken met 2 lijnen.
+
+~~~
+student@studentdeb:~$ ls -l hello.sh hello.sh.not &> lsall
+student@studentdeb:~$ cat lsall
+ls: cannot access 'hello.sh.not': No such file or directory
+-rwxr--r-- 1 student student 60 Mar 13 20:04 hello.sh
+~~~
+
+Als we nu de inhoud van deze file willen afleiden naar het wc-commando kunnen we dit doen als hieronder.
+
+~~~
+student@studentdeb:~$ wc < lsall
+  2  18 114
+student@studentdeb:~$ 
+~~~
+
+##### Redirection van STDIN/STDOUT vanuit een ander process/commando naar STDIN via |
+
+In bovenstaand voorbeeld werkten we nog altijd met een tussenfile - lsall - om de output
+van het ls-commando te verbinden aan het wc-commando.
+
+Er is echter een operator die de output-stream van het ene commando (ls) men de inputstream van het andere commando (wc).  
+Om dit te doen moet een pipe-opetor of | tussen beide commando's plaatsen zoals hieronder geillustreerd.
+
+~~~
+bart@studentdeb:~$ ls -l hello.sh hello.sh.not | wc
+ls: cannot access 'hello.sh.not': No such file or directory
+      1       9      52
+bart@studentdeb:~$
+~~~
+
+Bemerk hier wel dat deze pipe-operator enkel de stderror verbindt met de stdin.
+
+~~~
+            STDOUT    |    STDIN   STDOUT     CONSOLE:
+    +------+-----+-------->+------+-----+---->  1       9      52 
+    |  ls -l ... |         |     WC     |
+    +------+-----+         +------+-----+
+~~~
+
+
+##### Redirection vanuit een ander process/commando naar STDIN via |&
+
+Wil je toch beide proberen dan dien je dit te doen met een variant van de pike-operator die beide **STDERR en STDIN cobmineert**, namelijk **|&**
+
+~~~
+bart@studentdeb:~$ ls -l hello.sh hello.sh.not |& wc
+      2      18     112
+bart@studentdeb:~$ 
+~~~
+
+Met deze operator worden zowel de STDOUT als de STDERR bij elkaar gevoegd
+en doorgegeven aan de STDIN van WC.
+
+~~~
+            STDOUT  |&      STDIN   STDOUT     CONSOLE:
+    +------+-----+---+----->+------+-----+---->  2      18     112 
+    |  ls -l ... |   |      |     WC     |
+    +------+-----+---+      +------+-----+
+            STDERR
+~~~
+
