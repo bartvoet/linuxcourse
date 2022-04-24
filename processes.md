@@ -3,31 +3,131 @@
 Met dit deel van de cursus proberen we een minimum informatie mee te geven rond processen:
 
 * Wat?
-* Hoe ze te bekijken of monitoren? => **ps** en **top**
-* Hoe deze te manipuleren? => **signals** en **jobcontrol**
-* Hoe recurrente taken in te plannen? => **cron**
+* Hoe ze te **bekijken** of **monitoren**? => **ps** en **top**
+* Hoe deze te **manipuleren**? => **signals** en **jobcontrol**
+* Hoe **recurrente** taken in te plannen? => **cron**
+
+In een volgend hoofdstuk bekijken we ook nog systemd...
 
 Het kunnen werken met deze tools is belangrijk om bijvoorbeeld:
 
 * Te zien of een background taak nog altijd draait
-* Na te kijken waarom een programma blijft hangen
-* Het programma te beeindigen...
+* Na te kijken **waarom** een programma blijft **hangen**
+* Het **programma** te **beëindigen**...
+* Zien welke files een applicatie open heeft
 * ...
 
-### Wat is een process
+### Wat is een process?
 
-Elke keer als je een proces start - vanuit een terminal of een "graphical user interface" - start je process.  
-maw een process is een "runtime" instance van een programma.
+Elke keer als je een **programma start** - vanuit een terminal of een "graphical user interface" - start je **process**.  
+maw een process is een **"runtime" instance** van een programma.
 
 Het besturingssysteem houdt echter heel wat data bij rond dit process
 
-* Het programma (locatie)
-* Een identificatie
-* Een status
-* Een eigenaar (het programma wordt uitgevoerd door een user)
-* Files en andere resources dat dit process gebruikt
-* Lokale en globale variabelen (environment variables)
+* Het **programma** (locatie)
+* Een **identificatie** (pid)
+* Een **status**
+* Een **eigenaar** (het programma wordt uitgevoerd door een **user**)
+* **Files** en andere **resources** dat dit process gebruikt
+* **Lokale** en **globale** **variabelen** (environment variables)
+* Een virtueel geheugen
 * ...
+
+### Waar start het nu mee (boot-sequentie)
+
+Wat is het allereerste proces binnen een Linux-distribute?  
+Waar start het nu uiteindelijk?
+
+De allereerste software die op je computer (of embedded device) draait zijn bootloaders.  
+De eerste is de (1ste bootloader) die reeds op je chip staat, die is hardware en microcode die er voor zorgt dat een programma op je persistent geheugen (harde schrijf of flash) wordt gestart.
+
+~~~
++---------------------+
+|  1ST BOOTLOADER     | (bv. BIOS/UEFI)
++----------+----------+
+           |
++----------v----------+
+|  2ND BOOTLOADER     |  (bv. GRUB, UBoot)
++----------+----------+
+~~~
+
+Het eerste programma dat dan wordt opgestart is dan een secundaire bootloader.  
+Dit programma staat voor klassieke computers meestal in het MBR- (BIOS) of in de GPT-gedeelte (UEFI) van je harde schrijf.
+
+Dit programma dat beperkt in grootte is (meestal **GRUB** op klassieke computer of **UBoot** op embedded devices) doet dan de nodige voorbereidingen (geheugen initialiseren e.a.) om dan vervolgens een kernel op te starten.
+
+~~~
++---------------------+
+|  1ST BOOTLOADER     | (bv. BIOS/UEFI)
++----------+----------+
+           |
++----------v----------+
+|  2ND BOOTLOADER     |  (bv. GRUB, UBoot)
++----------+----------+
+           |
++----------v----------+
+|        KERNEL       |  => PID 0
++----------+----------+
+~~~
+
+Deze kernel is dan verantwoordelijk om verschillende **low-level taken** uit te voeren zoals:
+
+* CPU initialisatie en testen
+* Geheugen-test en -initialisatie
+* Drivers en kernel-modules laden
+* "Device en -bus discovery"  
+  (zorgen dat alle randapparatuur wordt gedetecteerd)
+* Mounten van een root filesystem
+
+De belangrijkste taak echter is - na bovenstaande initialisaties - het opstarten van 
+de userspace.
+
+~~~
++---------------------+
+|  1ST BOOTLOADER     | (bv. BIOS/UEFI)
++----------+----------+
+           |
++----------v----------+
+|  2ND BOOTLOADER     |  (bv. GRUB, UBoot)
++----------+----------+
+           |
++----------v----------+
+|        KERNEL       |  => PID 0
++----------+----------+
+           |
++----------v----------+
+|         INIT        |  => PID 1 (bv. systemd, init, system-v, ...)
++----------+----------+
+           |
++----------v----------+
+|       RUNLEVEL      |
++---------------------+
+~~~
+
+Deze userspace is dat het 1ste niet-kernel programma dat wordt opgestart en zal dan 
+de verschillende dameons, services, windowing-systemen op starten.
+
+Dit allereerste init-programma krijgt dan de PID 1 en heet als parent-process 0.  
+(dit parent-proces 0 is dan de kernel)
+
+~~~
+(base) bart@bvlegion:~$ ps -f 1
+UID          PID    PPID  C STIME TTY      STAT   TIME CMD
+root           1       0  0 Apr23 ?        Ss     0:05 /sbin/init splash
+~~~
+
+Op de meeste desktop- en server-systemen is dit **systemd**.  
+**systemd** zal vanaf de opstart de verschillende services (die je nodig hebt als gebruiker) gaan opstarten, beheren en controleren.
+
+~~~
+(base) bart@bvlegion:~$ ls -l /sbin/init 
+lrwxrwxrwx 1 root root 20 Jan 10 05:56 /sbin/init -> /lib/systemd/systemd
+(base) bart@bvlegion:~$ 
+~~~
+
+> Nota:  
+> We komen nog later terug op systemd, eerst focussen we op de processen en de andere tools
+> om deze te beheren
 
 ### Processen bekijken met ps
 
@@ -170,7 +270,7 @@ F S UID          PID    PPID  C PRI  NI ADDR SZ WCHAN  STIME TTY          TIME C
 4 R student     3931    1127  0  80   0 -  2425 -      22:59 pts/3    00:00:00 ps -efl
 ~~~
 
-#### process-status
+### Process-status
 
 Dit status-veld geeft de mogelijk proces-statussen weer (of PROCESS STATE CODES).  
 In de man-pagina van het ps-commando staan deze als volgt opgesteld.
@@ -187,48 +287,83 @@ X    dead (should never be seen)
 Z    defunct ("zombie") process, terminated but not reaped by its parent
 ~~~
 
-De meeset voorkomende zijn:
+De **meest** **voorkomende** zijn:
 
-* S => het process wacht op een event (dikwijls IO-gerelateerd)
-* R => actief of de processor
-* T => gestopt door een pauze-signaal
-* D => wachtend op IO (lezen van een file of een netwerk)
-* Z => beeindigd/dood
-
-
-#### paging
-
-Eerder hebben we **less** gezien als **pager**.  
-Deze pager stelt je in staat te zoeken op naam achter processen
+* **S** => het process wacht op een event (dikwijls IO-gerelateerd)
+* **R** => actief of de processor
+* **T** => gestopt door een pauze-signaal
+* **D** => wachtend op IO (lezen van een file of een netwerk)
+* **Z** => beeindigd/dood
 
 ~~~
-bart@bvlegion:~/Tmp/v$ ps -ef | less
-ID          PID    PPID  C STIME TTY          TIME CMD
-root           1       0  0 15:05 ?        00:00:01 /sbin/init
-root           2       0  0 15:05 ?        00:00:00 [kthreadd]
-root           3       2  0 15:05 ?        00:00:00 [rcu_gp]
-root           4       2  0 15:05 ?        00:00:00 [rcu_par_gp]
-root           6       2  0 15:05 ?        00:00:00 [kworker/0:0H-events_highpri]
-root           9       2  0 15:05 ?        00:00:00 [mm_percpu_wq]
-root          10       2  0 15:05 ?        00:00:00 [rcu_tasks_rude_]
-root          11       2  0 15:05 ?        00:00:00 [rcu_tasks_trace]
-root          12       2  0 15:05 ?        00:00:00 [ksoftirqd/0]
-root          13       2  0 15:05 ?        00:00:01 [rcu_sched]
-root          14       2  0 15:05 ?        00:00:00 [migration/0]
-root          15       2  0 15:05 ?        00:00:00 [cpuhp/0]
-root          17       2  0 15:05 ?        00:00:00 [kdevtmpfs]
-root          18       2  0 15:05 ?        00:00:00 [netns]
-root          19       2  0 15:05 ?        00:00:00 [kauditd]
-root          20       2  0 15:05 ?        00:00:00 [khungtaskd]
-root          21       2  0 15:05 ?        00:00:00 [oom_reaper]
-root          22       2  0 15:05 ?        00:00:00 [writeback]
-root          23       2  0 15:05 ?        00:00:02 [kcompactd0]
-:
+     Waiting for resource of signal  +-------------------------+
+  +---------------------------------->                         |
+  |                                  | Interruptible Sleep (D) |
+  |    +-----------------------------+                         |
+  |    |  Wakes Up/Signal            +-------------------------+
+  |    |
+  |    |
+  |    |    Waiting for resources    +-------------------------+
+  |    |        +-------------------->                         |
+  |    |        |                    | Interruptible Sleep (S) |
+  |    |        |                    |                         |
++-+----v--------+--------+<----------+-------------------------+
+|                        |  Wakes up
+|  Running          (R)  |
+|                        |  SIGSTOP
++-+-------------^--------+<----------+-------------------------+
+  |             |                    |                         |
+  |             |                    | Stopped             (T) |
+  |             |           SIGCONT  |                         |
+  |             +--------------------+-------------------------+
+  |
+  |
+  |                                  +-------------------------+
+  |                                  |                         |
+  |     exit() of kill-signal        | Zombie              (Z) |
+  +---------------------------------->                         |
+                                     +-------------------------+
 ~~~
+
+### Signals
+
+~~~
+bart@bvlegion:~$ kill -l
+ 1) SIGHUP	 2) SIGINT	 3) SIGQUIT	 4) SIGILL	 5) SIGTRAP
+ 6) SIGABRT	 7) SIGBUS	 8) SIGFPE	 9) SIGKILL	10) SIGUSR1
+11) SIGSEGV	12) SIGUSR2	13) SIGPIPE	14) SIGALRM	15) SIGTERM
+16) SIGSTKFLT	17) SIGCHLD	18) SIGCONT	19) SIGSTOP	20) SIGTSTP
+21) SIGTTIN	22) SIGTTOU	23) SIGURG	24) SIGXCPU	25) SIGXFSZ
+26) SIGVTALRM	27) SIGPROF	28) SIGWINCH	29) SIGIO	30) SIGPWR
+31) SIGSYS	34) SIGRTMIN	35) SIGRTMIN+1	36) SIGRTMIN+2	37) SIGRTMIN+3
+38) SIGRTMIN+4	39) SIGRTMIN+5	40) SIGRTMIN+6	41) SIGRTMIN+7	42) SIGRTMIN+8
+43) SIGRTMIN+9	44) SIGRTMIN+10	45) SIGRTMIN+11	46) SIGRTMIN+12	47) SIGRTMIN+13
+48) SIGRTMIN+14	49) SIGRTMIN+15	50) SIGRTMAX-14	51) SIGRTMAX-13	52) SIGRTMAX-12
+53) SIGRTMAX-11	54) SIGRTMAX-10	55) SIGRTMAX-9	56) SIGRTMAX-8	57) SIGRTMAX-7
+58) SIGRTMAX-6	59) SIGRTMAX-5	60) SIGRTMAX-4	61) SIGRTMAX-3	62) SIGRTMAX-2
+63) SIGRTMAX-1	64) SIGRTMAX	
+~~~
+
+* **15** - TERM - **Terminate**  
+  De default als je de code-optie niet ingeeft.  
+  Het is een vriendelijke manier van vragen, want programma's
+  kunnen dit negeren of een specifieke behandeling aan koppelen
+* **19** - STOP - **Stop**, unblockable  
+  De optie als je een process wil in suspend zetten.  
+  Dit komt overeen met **"ctrl + z"** op de command-line
+* **18** - CONT - **Continue**
+  Signaal om het process (dat eerder via signaal 19 was stopgezet) 
+  terug op te starten.
+* **2** - INT - Keyboard interrupt  
+  De optie als je vanuit een keyboard een process wil stoppen.  
+  Komt overeen met "ctrl + c", kan ook worden genegeerd.
+* **9** - **KILL** - Kill, unblockable
+  De ultieme manier om een process te stoppen.  
+  Kan niet omzeild worden door het process...
 
 ### top voor realtime monitoring
 
-ps zal je een snapshot geven van wat er op die moment gaande is.  
+**ps** zal je een **snapshot** geven van wat er op die moment gaande is.  
 ipv ps kan je top gebruiken voor real-time-monitoring, hou er wel rekening mee dat deze performantie-impact heeft
 
 ~~~
@@ -271,7 +406,6 @@ MiB Swap:   2048,0 total,   2048,0 free,      0,0 used.  21606,6 avail Mem
 
 1ste deel van top geeft ons statistieken rond uptime, users, aantal processen, cpu- en memory
 
-
 ~~~
 top - 12:48:49 up 19:38, 21 users,  load average: 2,83, 2,12, 1,88
 Tasks: 419 total,   1 running, 417 sleeping,   0 stopped,   1 zombie
@@ -289,6 +423,121 @@ MiB Swap:   2048,0 total,   2048,0 free,      0,0 used.  21606,6 avail Mem
 * COMMAND => commando dat het process heeft gestart
 
 ### JOBS & JOBCONTROL
+
+**Job control** is een tools binnen de shell die je toelaat vanuit 1 shell (of command-line) verschillende commando's te starten en te managen (in parallel)  
+
+Wanneer we een **commando** uitvoeren in **bash**, wordt het dus **uitgevoerd** als een **job**.  
+Het verstaan hoe dat je deze jobs moet **beheren** EN geeft je veel extra mogelijkheden...
+
+Bedoeling van dit stuk is proberen uit te zoeken wat deze jobs zijn (in bash) en hoe deze gelinkt worden aan processen.  
+We bekijken ook hoe je ze moet starten, pauzeren, in "background" laten runnen, ...
+
+
+#### Een job/commando => meerdere processen
+
+Een eerste belangrijk principe om te begrijpen is dan een JOB kan bestaan uit meerdere processen
+
+~~~
++--------+              +----------+
+|  JOB   +--------------+ PROCESS  |
++-----+--+              +----------+
+      |
+      |                 +----------+
+      +-----------------+ PROCESS  |
+                        +----------+
+
+                         ...
+~~~
+
+Laten we starten met een job die normaal gezien veel tijd moeten innemen.  
+De volgende opdracht gaat voor het woord blabla zoeken in all files binnen mijn home-directory.  
+(een job die meer dan een paar minuten kan duren afhanklijk van de grootte van je home-directory)
+
+~~~
+bart@bvlegion:~$ rgrep "blabla" . | less
+~~~
+
+Dit heeft nu een job gestart met 2 commando (grep en less).
+
+
+#### Job onderbreken met Ctrl+Z
+
+Laten we nu even deze job stoppen met de key-combo (ctrl-z) gebruik.  
+Dit zal deze job stoppen (of pauzeren) en dan krijg je een boodschap als hieronder op het scherm
+
+~~~
+[1]+  Stopped                 rgrep "blabla" . | less
+bart@bvlegion:~$ pwd 
+/home/bart
+bart@bvlegion:~$
+~~~
+
+Bemerk ook dat de prompt nu vrijgegeven is en ik andere commando's kan uitvoeren (voorbeeld met pwd)
+
+#### Job-table (en het commando jobs)
+
+De processen en de jobs zijn gestopt maar niet verdwenen.  
+Hiervoor voorziet bash namelijk een **job-table** die bijhoudt welke jobs worden uitgevoerd.
+
+Deze table kan je consulteren via het commando **jobs**.  
+Deze duidt aan dat er momenteel 1 job draaiende is, let ook dat deze een id heeft gekregen.  
+(in dit geval 1)
+
+~~~
+bart@bvlegion:~$ jobs
+[1]+  Stopped                 rgrep "blabla" . | less
+~~~
+
+Dit id (1 in het voorbeeld) is niet te verwarren met de PID.  
+Deze kan je ook bekijken door een extra optie mee te geven aan jobs (-l).
+
+~~~
+bart@bvlegion:~$ jobs -l
+[1]+ 84420 Stopped                 rgrep "blabla" .
+     84421                       | less
+bart@bvlegion:~$ 
+~~~
+
+Deze toont ook aan da je meerdere processen verbonden hebt aan deze job met hun pid (88420 en 88421 in dit geval).  
+Als we dit dan bestuderen via ps:
+
+~~~
+bart@bvlegion:~$ ps -l
+F S   UID     PID    PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
+0 S  1000    3116    2861  0  80   0 -  2870 do_wai pts/6    00:00:00 bash
+0 T  1000   84420    3116  0  80   0 -  2428 do_sig pts/6    00:00:01 grep
+0 T  1000   84421    3116  0  80   0 -  2193 do_sig pts/6    00:00:00 less
+4 R  1000   86246    3116  0  80   0 -  2936 -      pts/6    00:00:00 ps
+~~~
+
+* Je **main-process** is je **bash-shell** en heeft de pid **3116**
+  * Dit process staat in de de **S-status**  
+    (wat er op neerkomt dat deze wacht op CPU-tijd en idle is)
+* Deze heeft **2 children**
+  * 84420 => grep-commando
+  * 84421 => less-commando
+  * Deze **2 commando's** staan in de **T-status**  
+    (stop-status die je na een SIGSTOP verkrijgt)
+
+Om deze job terug naar de voorgrond te brengen kan je het commando **fg** gebruiken waardoor het 
+terug op de voorgrond verschijnt en je bijvoorbeeld Ctrl+C kan gebruiken om dit te beeindigen.
+
+Hoe dit programma **fg** en zijn collega **bg** kunnen gebruiken om meerdere jobs te runnen gaan we nu zien.
+
+#### Een job in background draaien
+
+We hadden nu een job tegelijk in "background" geplaatst en op pauze geplaatst.  
+Wat als je echter eeen job direct in de achtergrond wil draaien.  
+
+Dit kan je bereiken door aan een commando te prependen met &
+
+~~~
+
+~~~
+
+
+#### Background en foreground
+
 
 commando naar background verwijzen: 
 
@@ -365,43 +614,6 @@ bart@bvlegion:~$ jobs -l
 [1]- 61670 Running                 sleep 10000 &
 [2]+ 61685 Running 
 ~~~
-
-### Signals
-
-~~~
-bart@bvlegion:~$ kill -l
- 1) SIGHUP	 2) SIGINT	 3) SIGQUIT	 4) SIGILL	 5) SIGTRAP
- 6) SIGABRT	 7) SIGBUS	 8) SIGFPE	 9) SIGKILL	10) SIGUSR1
-11) SIGSEGV	12) SIGUSR2	13) SIGPIPE	14) SIGALRM	15) SIGTERM
-16) SIGSTKFLT	17) SIGCHLD	18) SIGCONT	19) SIGSTOP	20) SIGTSTP
-21) SIGTTIN	22) SIGTTOU	23) SIGURG	24) SIGXCPU	25) SIGXFSZ
-26) SIGVTALRM	27) SIGPROF	28) SIGWINCH	29) SIGIO	30) SIGPWR
-31) SIGSYS	34) SIGRTMIN	35) SIGRTMIN+1	36) SIGRTMIN+2	37) SIGRTMIN+3
-38) SIGRTMIN+4	39) SIGRTMIN+5	40) SIGRTMIN+6	41) SIGRTMIN+7	42) SIGRTMIN+8
-43) SIGRTMIN+9	44) SIGRTMIN+10	45) SIGRTMIN+11	46) SIGRTMIN+12	47) SIGRTMIN+13
-48) SIGRTMIN+14	49) SIGRTMIN+15	50) SIGRTMAX-14	51) SIGRTMAX-13	52) SIGRTMAX-12
-53) SIGRTMAX-11	54) SIGRTMAX-10	55) SIGRTMAX-9	56) SIGRTMAX-8	57) SIGRTMAX-7
-58) SIGRTMAX-6	59) SIGRTMAX-5	60) SIGRTMAX-4	61) SIGRTMAX-3	62) SIGRTMAX-2
-63) SIGRTMAX-1	64) SIGRTMAX	
-~~~
-
-* 15 - TERM - Terminate  
-  De default als je de code-optie niet ingeeft.  
-  Het is een vriendelijke manier van vragen, want programma's
-  kunnen dit negeren of een specifieke behandeling aan koppelen
-* 19 - STOP - Stop, unblockable  
-  De optie als je een process wil in suspend zetten.  
-  Dit komt overeen met "ctrl + z" op de command-line
-* 18 - CONT - Continue
-  Signaal om het process (dat eerder via signaal 19 was stopgezet) 
-  terug op te starten.
-* 2 - INT - Keyboard interrupt  
-  De optie als je vanuit een keyboard een process wil stoppen.  
-  Komt overeen met "ctrl + c", kan ook worden genegeerd.
-* 9 - KILL - Kill, unblockable
-  De ultieme manier om een process te stoppen.  
-  Kan niet omzeild worden door het process...
-
 
 ### crontab
 
