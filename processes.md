@@ -356,10 +356,80 @@ bart@bvlegion:~$ kill -l
   terug op te starten.
 * **2** - INT - Keyboard interrupt  
   De optie als je vanuit een keyboard een process wil stoppen.  
-  Komt overeen met "ctrl + c", kan ook worden genegeerd.
+  Komt overeen met "ctrl + c", kan ook worden genegeerd door de applicatie.
 * **9** - **KILL** - Kill, unblockable
   De ultieme manier om een process te stoppen.  
   Kan niet omzeild worden door het process...
+
+
+### kill-commando
+
+We starten een langdurende job (die de prompt zal onderbreken)
+
+Terminal 1:
+
+~~~
+bvo@kataja:~$ sleep 5000
+~~~
+
+We openen een aparte console om het PID op te zoeken
+
+Terminal 2:
+
+~~~
+bvo@kataja:~$ ps -u bvo | grep sleep
+50663 pts/23   00:00:00 sleep
+bvo@kataja:~$ ps -f 50663 | grep sleep
+bvo      50663 57255  0 13:49 pts/23   S      0:00 sleep 5000
+~~~
+
+We zien dat deze job pid 50663 heeft en in de idle-state is.  
+
+
+Via het kill-commando kan ik nu signaleren sturen.  
+We sturen het SIGSTOP-signaal (19) om er voor te zorgen dat deze job stopt (pauzeert)
+
+Terminal 2:
+
+~~~
+bvo@kataja:~$ kill -19 50663
+bvo@kataja:~$ ps -f 50663 | grep sleep
+bvo      50663 57255  0 13:49 pts/23   T      0:00 sleep 5000
+~~~
+
+Aan de kant van terminal 1 zien we dat de prompt is vrijgekomen.  
+Daar kunnen we zien (via het commando jobs dat we zo dadelijk verder uitleggen) dat deze job in een stop-state staat...
+
+Terminal 1:
+
+~~~
+bvo@kataja:~$ jobs
+[1]+  Stopped                 sleep 5000
+bvo@kataja:~$ 
+~~~
+
+De job staat dan wel in de stop-state (T), dit betekent echter niet dat deze job beeindigd is.  
+We kunnen deze job laten herstarten via het SIGSTART-signaal (18).
+
+Terminal 2:
+
+~~~
+bvo@kataja:~$ kill -18 50663
+bvo@kataja:~$ ps -f 50663 | grep sleep
+bvo      50663 57255  0 13:49 pts/23   S      0:00 sleep 5000
+bvo@kataja:~$
+~~~
+
+Aan de kant van terminal 1 zien we dat deze job ook runnig is (weliswaar in de achtergrond)
+
+Terminal 1:
+
+~~~
+bvo@kataja:~$ jobs
+[1]+  Running                 sleep 5000 &
+bvo@kataja:~$ fg
+sleep 5000
+~~~
 
 ### top voor realtime monitoring
 
