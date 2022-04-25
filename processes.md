@@ -438,12 +438,17 @@ We bekijken ook hoe je ze moet starten, pauzeren, in "background" laten runnen, 
 Een eerste belangrijk principe om te begrijpen is dan een JOB kan bestaan uit meerdere processen
 
 ~~~
-+--------+              +----------+
++--------+
+|  CMD   |  Een commando starten 
++---+----+  maakt een job aan binnen bash
+    |
+    |
++---v----+              +----------+
 |  JOB   +--------------+ PROCESS  |
-+-----+--+              +----------+
-      |
-      |                 +----------+
-      +-----------------+ PROCESS  |
++---+----+              +----------+
+    |  Deze job bestaat uit 1 of meerdere processen
+    |                   +----------+
+    +-------------------+ PROCESS  |
                         +----------+
 
                          ...
@@ -524,96 +529,189 @@ terug op de voorgrond verschijnt en je bijvoorbeeld Ctrl+C kan gebruiken om dit 
 
 Hoe dit programma **fg** en zijn collega **bg** kunnen gebruiken om meerdere jobs te runnen gaan we nu zien.
 
-#### Een job in background draaien
+#### Een job in background draaien met &
 
-We hadden nu een job tegelijk in "background" geplaatst en op pauze geplaatst.  
-Wat als je echter eeen job direct in de achtergrond wil draaien.  
+Een job waarvan het process wordt gepauzeerd (door een STOP-signaal) wordt in background geplaatst.  
+Wat als je een job **direct** in de **achtergrond** wil laten lopen (en niet stoppen)?
 
-Dit kan je bereiken door aan een commando te prependen met &
+Dit kan op verschillende manieren, maar een veel gebruikte is je commando te laten volgen door een **&**.  
+Dit zorgt ervoor dat je command-prompt niet zal wachten op deze job en deze dus in background draait...
 
-~~~
+In het onderstaande voorbeeld starten we 3 jobs adhv het commando sleep 
 
-~~~
-
-
-#### Background en foreground
-
-
-commando naar background verwijzen: 
+> sleep is een tool die een gegeven aantal seconden zal wachten
+> deze wordt veel gebruikt binnen scripten om voor een delay te zorgen
 
 ~~~
-bart@bvlegion:~$ sleep 10000 &
+bvo@kataja:~$ sleep 360 &
+[1] 31056
+bvo@kataja:~$ sleep 365 &
+[2] 31452
+bvo@kataja:~$ sleep 370 &
+[3] 31714
 ~~~
 
-de jobs bekijken
+#### Job-table
+
+Bash houdt alle jobs binnen je bash-sessie bij in een job-table.  
+Zoals eerder getoond kan je hier het commando jobs voor gebruiken, de short option l zorgt ervoor dat je deze kan correleren met het process-id
 
 ~~~
-bart@bvlegion:~$ jobs
-[1]+  Running                 sleep 10000 &
+bvo@kataja:~$ jobs -l
+[1]  31056 Running                 sleep 360 &
+[2]- 31452 Running                 sleep 365 &
+[3]+ 31714 Running                 sleep 370 &
 ~~~
 
-de status is S (wacht op een event timer)
+Als we nu de job-table bekijken zien we dat er 3 jobs draaien:
+
+* job 1 met een process 31056 (sleep 360)
+* job 1 met een process 31452 (sleep 365)
+* job 1 met een process 31714 (sleep 370)
+
+> Bemerk ook dat de laatst gestart job wordt voorafgegaan door een + en de voorlaatste door een -
+
+De processen die gelinkt zijn aan deze job vind je terug via ps (zie PID's):
 
 ~~~
-bart@bvlegion:~$ ps aux | grep "sleep 10000"
-bart       59339  0.0  0.0   8412   584 pts/20   S    13:09   0:00 sleep 10000
-bart       59352  0.0  0.0   9372  2768 pts/20   S+   13:09   0:00 grep --color=auto sleep 10000
+bvo@kataja:~$ ps -l
+F S   UID   PID  PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
+0 S  1173  2425  2424  0  80   0 -  2141 -      pts/16   00:00:00 bash
+0 S  1173 31056  2425  0  80   0 -  1315 hrtime pts/16   00:00:00 sleep
+0 S  1173 31452  2425  0  80   0 -  1315 hrtime pts/16   00:00:00 sleep
+0 S  1173 31714  2425  0  80   0 -  1315 hrtime pts/16   00:00:00 sleep
+0 R  1173 33096  2425  0  80   0 -  2637 -      pts/16   00:00:00 ps
 ~~~
 
-De job terug naar foreground brengen
+#### fg-commando
+
+Stel dat je 1 van de jobs terug naar de voorgrond wil brengen dan kan je dit doen via het fg-commando.
 
 ~~~
-bart@bvlegion:~$ fg
-sleep 10000
+bvo@kataja:~$ jobs -l
+[1]  31056 Running                 sleep 360 &
+[2]- 31452 Running                 sleep 365 &
+[3]+ 31714 Running                 sleep 370 &
 ~~~
 
-ctrl+Z gebruiken om deze terug om deze taak naar de background te brengen
-
+Hiervoor duid je de job aan die je wenst naar de voorgrond te brengen met een % gevolgd door de jobnummer (niet de pid)
 
 ~~~
-bart@bvlegion:~$ fg
-sleep 10000
+bvo@kataja:~$ fg %2
+sleep 365
+~~~
 
+Job met nummer 2 wordt dan opnieuw naar de voorgrond en de prompt wordt dan opnieuw geblokkeerd (wachtende op het beeindigen van deze job)
+
+#### bg-commando
+
+Als je nu (vanuit deze shell) de job terug naar de achtergrond wil brengen gebruik je Ctrl+z hetgeen een stop-signaal zal zenden naar het process gelinkt naar deze job.
+
+~~~
+bvo@kataja:~$ fg %2
+sleep 365
 ^Z
-[1]+  Stopped                 sleep 10000
-bart@bvlegion:~$ ps aux | grep "sleep 10000"
-bart       59339  0.0  0.0   8412   584 pts/20   T    13:09   0:00 sleep 10000
-bart       59400  0.0  0.0   9372  2584 pts/20   S+   13:10   0:00 grep --color=auto sleep 10000
-bart@bvlegion:~$ jobs
-[1]+  Stopped                 sleep 10000
-bart@bvlegion:~$ bg %1
-[1]+ sleep 10000 &
-bart@bvlegion:~$ jobs
-[1]+  Running                 sleep 10000 &
-bart@bvlegion:~$ 
+[2]+  Stopped                 sleep 365
+bvo@kataja:~$
 ~~~
 
+De prompt komt terug vrij maar de job blijft echter nog in een stop-status
 
 ~~~
-bart@bvlegion:~$ ps j
-   PPID     PID    PGID     SID TTY        TPGID STAT   UID   TIME COMMAND
-  57996   58003   58003   58003 pts/0      58009 Ss    1000   0:00 bash
-   3136   59339   59339    3136 pts/20     59622 S     1000   0:00 sleep 10000
-   3136   59622   59622    3136 pts/20     59622 R+    1000   0:00 ps j
+bvo@kataja:~$ jobs -l
+[1]  31056 Running                 sleep 360 &
+[2]+ 31452 Stopped                 sleep 365
+[3]- 31714 Running                 sleep 370 &
 ~~~
 
-~~~
-bart@bvlegion:~$ jobs -l
-[1]- 61670 Running                 sleep 10000 &
-[2]+ 61685 Stopped                 sleep 5000
-bart@bvlegion:~$ bg %2
-[2]+ sleep 5000 &
-bart@bvlegion:~$ jobs -l
-[1]- 61670 Running                 sleep 10000 &
-[2]+ 61685 Running                 sleep 5000 &
-bart@bvlegion:~$ kill -19 61685
+Het je ook terugvindt in de proces-table, zie pid 31452 dat in status T staat.
 
-[2]+  Stopped                 sleep 5000
-bart@bvlegion:~$ kill -18 61685
-bart@bvlegion:~$ jobs -l
-[1]- 61670 Running                 sleep 10000 &
-[2]+ 61685 Running 
 ~~~
+bvo@kataja:~$ ps -l
+F S   UID   PID  PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
+0 S  1173  2425  2424  0  80   0 -  2141 -      pts/16   00:00:00 bash
+0 S  1173 31056  2425  0  80   0 -  1315 hrtime pts/16   00:00:00 sleep
+0 T  1173 31452  2425  0  80   0 -  1315 -      pts/16   00:00:00 sleep
+0 S  1173 31714  2425  0  80   0 -  1315 hrtime pts/16   00:00:00 sleep
+0 R  1173 35174  2425  0  80   0 -  2637 -      pts/16   00:00:00 ps
+~~~
+
+Om het proces terug te hervatten kan je die doen via het commando bg.  
+Deze zal de job terug in running-state plaatsen en het process hervatten.
+
+~~~
+bvo@kataja:~$ bg %2
+[2]+ sleep 365 &
+bvo@kataja:~$ jobs -l
+[1]  31056 Running                 sleep 360 &
+[2]- 31452 Running                 sleep 365 &
+[3]+ 31714 Running                 sleep 370 &
+~~~
+
+Je kon ook kiezen dit process opnieuw in fg te brengen
+
+#### Job beeindigen met fg en Ctrl-C
+
+De meest éénvoudige manier om een job te beeindigen is het volgende 2-stappen-process:
+
+* De job naar de voorgrond brengen (via fg)
+* Deze job vervolgens te stoppen via Ctrl+c
+
+~~~
+bvo@kataja:~$ fg %3
+sleep 370
+^C
+bvo@kataja:~$ 
+~~~
+
+Vervolgens zal je zien dat deze job gestopt is (en verwijderd uit de job-table)
+
+~~~
+bvo@kataja:~$ jobs
+[1]-  Running                 sleep 360 &
+[2]+  Running                 sleep 365 &
+bvo@kataja:~$
+~~~
+
+#### Beeindigen via kill
+
+Je kan een job ook beindigen adhv het kill commando.  
+Gegeven dat je onderstaande job-table overhebt...
+
+~~~
+bvo@kataja:~$ jobs
+[1]-  Running                 sleep 360 &
+[2]+  Running                 sleep 365 &
+bvo@kataja:~$
+~~~
+
+...kan je deze job stoppen met hulp van de percentage-notatie (je hoeft niet de pid te gebruiken)
+
+~~~
+bvo@kataja:~$ kill %1
+~~~
+
+Deze job zie je nadien nog in de job-table met de status "Terminated"
+
+~~~
+bvo@kataja:~$ jobs
+[1]-  Terminated              sleep 360
+[2]+  Running                 sleep 365 &
+bvo@kataja:~$
+~~~
+
+#### Done...
+
+Als we de overblijvende job laten "uitdraaien" dan zal deze job uiteindelijk (na +- 365 seconden in de )
+
+~~~
+bvo@kataja:~$ jobs
+[2]+  Done                    sleep 365
+bvo@kataja:~$ jobs
+bvo@kataja:~$
+~~~
+
+Eénmaal de info is opgevraagd verdwijnt deze job uit de jobtable...
 
 ### crontab
 
