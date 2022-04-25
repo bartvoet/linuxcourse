@@ -135,6 +135,8 @@ We kunnen deze processen - en hun eigenschappen - bekijken op je machine via het
 ps is de afkorting voor **"process status"**
 Laten we het even uitvoeren...
 
+#### Shell-processen
+
 We zien dat - zonder bijhorende opties - dat dit commando enkel de processen printen binnen je huidige terminal.
 
 ~~~
@@ -327,6 +329,20 @@ De **meest** **voorkomende** zijn:
 
 ### Signals
 
+Om de status te kunnen wijzigen kan je vanuit de shell de status van processen wijzigen via **signalen**.  
+Deze signalen worden tussen processen naar elkaar doorgestuurd om 
+
+De signalen zijn een communicatiemiddel tussen processen.  
+Wanneer een proces een signaal ontvangt, onderbreekt het proces de uitvoering ervan en wordt een signaalbehandelaar uitgevoerd.
+
+Hoe het programma zich gedraagt, hangt meestal af van het type signaal dat wordt ontvangen.  
+Nadat het signaal is verwerkt, kan het proces zijn normale uitvoering al dan niet voortzetten.
+
+De Linux-kernel kan bijvoorbeeld signalen verzenden wanneer een proces probeert te delen door nul en het SIGFPE-signaal ontvangt.  
+(zie bijvoorbeeld in je Python-cursus waar we een exception provoceren door een getal door 0 te delen, hetgeen een exception genereerd)
+
+Een overzicht van deze signalen kan je bekomen via het commando **kill -l** (zo dadelijk meer of het kill-commando)
+
 ~~~
 bart@bvlegion:~$ kill -l
  1) SIGHUP	 2) SIGINT	 3) SIGQUIT	 4) SIGILL	 5) SIGTRAP
@@ -344,29 +360,68 @@ bart@bvlegion:~$ kill -l
 63) SIGRTMAX-1	64) SIGRTMAX	
 ~~~
 
-* **15** - TERM - **Terminate**  
-  De default als je de code-optie niet ingeeft.  
-  Het is een vriendelijke manier van vragen, want programma's
-  kunnen dit negeren of een specifieke behandeling aan koppelen
-* **19** - STOP - **Stop**, unblockable  
-  De optie als je een process wil in suspend zetten.  
-  Dit komt overeen met **"ctrl + z"** op de command-line
-* **18** - CONT - **Continue**
-  Signaal om het process (dat eerder via signaal 19 was stopgezet) 
-  terug op te starten.
-* **2** - INT - Keyboard interrupt  
-  De optie als je vanuit een keyboard een process wil stoppen.  
-  Komt overeen met "ctrl + c", kan ook worden genegeerd door de applicatie.
-* **9** - **KILL** - Kill, unblockable
-  De ultieme manier om een process te stoppen.  
-  Kan niet omzeild worden door het process...
+Niet alle signalen zijn even belangrijk.  
+De belangrijkste (meest gebruikte) signalen zijn SIGTERM, SIGQUIT, SIGSTOP? SIGING en SIGKILL
 
 
-### kill-commando
+#### SIGTERM (15) en SIGQUIT (13)
 
-We starten een langdurende job (die de prompt zal onderbreken)
+SIGTERM- en alsook SIGQUIT-signalen zijn bedoeld om het proces te beëindigen.  
+In dit geval vragen we specifiek om het af te maken. 
 
-Terminal 1:
+SIGTERM is trouwens het standaardsignaal wanneer we het kill-commando gebruiken.  
+maw het is een vriendelijke manier van vragen, want programma's kunnen dit negeren of een specifieke behandeling aan koppelen
+
+SIGQUIT genereert echter ook een kerndump voordat het wordt afgesloten.
+
+#### SIGSTOP (19) en SIGCONT (18)
+
+SIGSTOP EN SIGCONT worden veel te samen gebruikt.  
+
+De 1ste zal een process suspenden of pauzeren, het programma wordt niet beeindigd!!!  
+Dit komt overeen met **"ctrl + z"** op de command-line.
+
+De 2de is een signaal om het process (dat eerder via signaal 19 was stopgezet) terug op te starten.
+
+> We tonen hier zo dadelijk een voorbeeld van
+
+#### SIGINT (2) of keyboard-interrupt
+
+SIGINT is het signaal dat wordt verzonden wanneer we Ctrl+C ingegven.  
+De standaardactie is om het proces te beëindigen.  
+
+Sommige programma's negeren deze actie echter en gaan er anders mee om.
+Een bekend voorbeeld is de bash-interpreter.  
+
+Wanneer we op Ctrl+C drukken, wordt het niet afgesloten, maar wordt een nieuwe en lege promptregel afgedrukt. 
+
+
+#### SIGKILL (9)
+
+Ook wel de ultieme manier genoemd om een process te stoppen (als alle anderen falen).  
+
+Wanneer een proces deze SIGKILL ontvangt, wordt het zowiezo beëindigd.  
+Dit is een speciaal signaal omdat het niet kan worden genegeerd door het process en het process zowiezo wordt beeindigd
+
+We gebruiken dit signaal om het proces geforceerd te beëindigen.  
+We moeten voorzichtig zijn, omdat het proces geen enkele opruimroutine kan uitvoeren.
+
+Een veelgebruikte manier om SIGKILL te gebruiken is om eerst SIGTERM te verzenden.  
+We geven het proces wat tijd om te beëindigen, we kunnen ook een paar keer SIGTERM sturen. Als het proces niet vanzelf wordt voltooid, sturen we SIGKILL om het te beëindigen.
+
+### Kill-commando
+
+Het kill-commando laat je toe 1 van bovenstaande signalen naar een applicatie toe te sturen.  
+Je gebruik dit als volgt:
+
+~~~
+kill -<nummer> <pid>
+~~~
+
+We illusteren dit adhv de SIGSTOP en SIGCONT-signalen...  
+Als eerste starten we een langdurende job (die de prompt zal onderbreken)
+
+* Terminal 1:
 
 ~~~
 bvo@kataja:~$ sleep 5000
@@ -374,7 +429,7 @@ bvo@kataja:~$ sleep 5000
 
 We openen een aparte console om het PID op te zoeken
 
-Terminal 2:
+* Terminal 2:
 
 ~~~
 bvo@kataja:~$ ps -u bvo | grep sleep
@@ -389,7 +444,7 @@ We zien dat deze job pid 50663 heeft en in de idle-state is.
 Via het kill-commando kan ik nu signaleren sturen.  
 We sturen het SIGSTOP-signaal (19) om er voor te zorgen dat deze job stopt (pauzeert)
 
-Terminal 2:
+* Terminal 2:
 
 ~~~
 bvo@kataja:~$ kill -19 50663
@@ -400,7 +455,7 @@ bvo      50663 57255  0 13:49 pts/23   T      0:00 sleep 5000
 Aan de kant van terminal 1 zien we dat de prompt is vrijgekomen.  
 Daar kunnen we zien (via het commando jobs dat we zo dadelijk verder uitleggen) dat deze job in een stop-state staat...
 
-Terminal 1:
+* Terminal 1:
 
 ~~~
 bvo@kataja:~$ jobs
@@ -411,7 +466,7 @@ bvo@kataja:~$
 De job staat dan wel in de stop-state (T), dit betekent echter niet dat deze job beeindigd is.  
 We kunnen deze job laten herstarten via het SIGSTART-signaal (18).
 
-Terminal 2:
+* Terminal 2:
 
 ~~~
 bvo@kataja:~$ kill -18 50663
@@ -422,7 +477,7 @@ bvo@kataja:~$
 
 Aan de kant van terminal 1 zien we dat deze job ook runnig is (weliswaar in de achtergrond)
 
-Terminal 1:
+* Terminal 1:
 
 ~~~
 bvo@kataja:~$ jobs
