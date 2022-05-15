@@ -1,4 +1,4 @@
-## Getting started => installatie van een Linux-distro!!
+## Getting started => installatie van een Linux-distro!! (Debian)
 
 Vooraleer we met de cursus starten moeten we leren een **Linux-distro** te **installeren**.  
 

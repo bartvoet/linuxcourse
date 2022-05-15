@@ -17,6 +17,7 @@ CHAPTER_01 += ${pagebreak}
 CHAPTER_01 += processes.md
 CHAPTER_01 += ${pagebreak}
 CHAPTER_01 += integration_excercise.md
+CHAPTER_01 += fedora.md
 
 
 
