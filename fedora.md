@@ -1,6 +1,6 @@
 ## Getting started 2 => installatie van een 2de distro (Fedora)
 
-### Downloaden van de Fedora
+### Downloaden van de "Fedora Workstation"-image
 
 Alvorens te starten downloaden we de meest recente versie van Fedora te vinden te https://getfedora.org/nl/workstation/download/
 
