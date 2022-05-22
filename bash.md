@@ -642,3 +642,4 @@ bart@bvlegion:~$ echo $old_directory
 /home/bart/Tmp
 bart@bvlegion:~$ 
 ~~~
+

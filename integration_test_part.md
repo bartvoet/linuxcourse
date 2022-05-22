@@ -7,10 +7,10 @@ Los al je vragen op binnen deze text-file en upload deze naar Toledo.
 #### Users en access
 
 Maak 2 users **gwen** en **mark** aan op je linux-systeem.  
-Voeg beide users aan de groep lectoren toe.
+Voeg beide users aan de groep **lectoren** toe.
 
-Maak een directory /home/lectoren/leerstof aan en een directory /home/lectoren/examens resultaten.  
-Zorg ervoor dat niemand deze directory kan deleten.
+Maak een directories /home/lectoren/leerstof aan en een directory /home/lectoren/examens resultaten.  
+Zorg ervoor dat niemand de directories leerstof en examens kan deleten.
 
 Zorg ervoor dat enkel gwen en mark files kunnen toevoegen beide subdirectories /home/lectoren/leerstof en directory /home/lectoren/examens
 Alle gebruikers op het systeem hebben toegang tot /home/lectoren/leerstof.
@@ -42,7 +42,7 @@ Antwoord (schrijf je antwoord tussen de tildes):
 Ik voer volgend commando uit
 
 ~~~
-$ echo "Hello World" > ~/hello.sh
+$ echo "echo Hello World" > ~/hello.sh
 ~~~
 
 Waar komt dit script terecht?  
@@ -70,6 +70,12 @@ Gebruik hiervoor "command-substitution":
 ~~~
 $ ./print_current_directory
 Mijn huidige directory is /home/bart/test"
+~~~
+
+Plaats hier je script
+
+~~~bash
+
 ~~~
 
 #### Commmando's

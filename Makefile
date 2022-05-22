@@ -16,7 +16,12 @@ CHAPTER_01 += bash.md
 CHAPTER_01 += ${pagebreak}
 CHAPTER_01 += processes.md
 CHAPTER_01 += ${pagebreak}
+CHAPTER_01 += text.md
+CHAPTER_01 += ${pagebreak}
+CHAPTER_01 += links_and_aliases.md
+CHAPTER_01 += ${pagebreak}
 CHAPTER_01 += integration_excercise.md
+CHAPTER_01 += ${pagebreak}
 CHAPTER_02 += integration_test_part.md
 CHAPTER_01 += ${pagebreak}
 CHAPTER_02 += intro_part2.md
@@ -26,6 +31,9 @@ CHAPTER_02 += ${pagebreak}
 CHAPTER_02 += nm_to_networkd.md
 CHAPTER_02 += ${pagebreak}
 CHAPTER_02 += internnetwork.md
+CHAPTER_02 += ${pagebreak}
+CHAPTER_02 += systemd.md
+
 
 
 CHAPTERS += $(CHAPTER_01) $(CHAPTER_02)

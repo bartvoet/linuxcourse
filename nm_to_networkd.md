@@ -1,5 +1,7 @@
 ## Werken met systemd-networkd
 
+By default starten vele systemen met de default networkmanager.
+
 ### Migratie naar systemd-networkd
 
 ~~~
