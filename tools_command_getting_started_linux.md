@@ -1303,7 +1303,7 @@ ls "$*"
 
 Als je dan de output bestudeert:
 
-* **$@** zal **substitueren** naar **3** aparte **argumenten**
+* **$```@```** zal **substitueren** naar **3** aparte **argumenten**
 * **$```*```** zal substitueren naar **1 string**
 
 ~~~

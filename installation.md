@@ -209,28 +209,29 @@ tekst-georienteerde installatie, zonder muis)
 
 Je drukt gewoon op enter en de installatie zal starten...
 
-#### Locatie-gegevens kiezen
+#### Locatie- en taalgegevens kiezen
 
-De eerste stap hier is het selecteren van je locatie:
+De eerste stap is het selecteren van de taal, we kiezen hier voor
+**Engels**:
+
+![](Pictures/100000000000032100000298E8400320416A9111.png)
+
+Druk op **Continue**, de volgende stap nu is het **selecteren** van je **locatie**:
 
 ![](Pictures/100000000000031D0000029B78C8D40B81F5C369.png)
 
-België is niet in het hoofdmenu voorzien, dus selecteer "other" en klik
-op "Continue"
+**België** is **niet** in het **hoofdmenu** voorzien, dus selecteer **"other"** en klik
+op **"Continue"**
 
-Kies vervolgens voor "Europe"
+**Kies** vervolgens voor **"Europe"**
 
 ![](Pictures/100000000000031A000002928323622F3DED1B49.png)
 
-Tenslotte kan je Belgie selecteren als land waar je VM toebehoort
+Tenslotte kan je **België** selecteren als land waar je VM toebehoort
 (hetgeen wordt gebruikt om je timezone te weten te komen)
 
 ![](Pictures/100000000000031B000002982D48F090782C5816.png)
 
-De volgende stap is het selecteren van de taal, we kiezen hier voor
-Engels:
-
-![](Pictures/100000000000032100000298E8400320416A9111.png)
 
 Aan een taal wordt ook een "locale" gekoppeld die aanduidt welke variant
 van Engels er zal gebruikt worden, kies hier voor de "en\_US"-versie
@@ -239,46 +240,48 @@ van Engels er zal gebruikt worden, kies hier voor de "en\_US"-versie
 
 Daarna selecteer je het keyboard.
 
-Als je de standaard Belgische **Azerty-layout** gebruikt kan je de volgende
-keuze maken:
+Als je de standaard Belgische **Azerty-layout** gebruikt kan je de keuze maken zoals geïllustreerd, anders selecteer je het keyboard dat op jij setup van toepassing is:
+
+> Vanzelfsprekend kies je een andere layout als dat van toepassing is op je PC...
 
 ![](Pictures/100000000000031D00000299CA42E08DA77969BD.png)
 
-Eenmaal het keyboard geselecteerd klik je op "Continue" en de
-installatie-image gaat een aantal netwerk-configuraties uitvoeren:
+**Eenmaal** het **keyboard geselecteerd** klik je op **"Continue"** en de
+installatie-image gaat een aantal **netwerk-configuraties** uitvoeren:
 
 ![](Pictures/100000000000031B0000029441D8AC48FA160319.png)
 
 #### User en naam-gegevens
 
-Je Debian-installatie heeft een hostname nodig, hier mag je de naam
-**studentdeb** kiezen, probeer deze naam te kiezen gezien deze naam bij
+Je Debian-installatie heeft een **hostname** nodig, je kiest hier de naam
+**studentdeb**, probeer deze naam te behouden gezien deze naam bij
 toekomstige voorbeelden zal terugkomen.
 
 ![](Pictures/100000000000031D0000029A1F70A22B43D1681A.png)
 
-Klik op "Continue", de domain-naam mag je voorlopig ook negeren
-("Continue")
+Klik op "Continue", de **domain-naam** mag je voorlopig ook **negeren**
 
 ![](Pictures/1000000000000320000002961DF412DDAF054AB4.png)
 
-Vervolgens dien je een password in te dienen voor je root-account. Dit
-is een account waarmee je alle permissies heb en die je normaal gezien
-enkel gebruikt om configuraties of installaties uit te voeren (te
+Vervolgens dien je een **password** in te dienen voor je **root-account**.  
+Dit is een account waarmee je alle permissies hebt en die je normaal gezien
+**enkel gebruikt** om **systeem-configuraties** of **installaties** uit te voeren (te
 vergelijken in de Windows-wereld met Administrator-rechten)
 
-Kies hier zeker een **password** uit die je **kan onthouden**...
+We dienen hier een **password** te gebruiken dat je **kan onthouden**...  
+Gezien het hier een proefstelling is gebruik ja als password **student**
 
-Gezien deze image enkel voor educatieve doeleinden zal worden gebruik
-mag je een gemakkelijk paswoord kiezen (maar doe dit niet als je met je
-eigen machine werkt)
+> Gezien deze image enkel voor educatieve doeleinden zal worden gebruik
+mag je een gemakkelijk paswoord kiezen.
+>Doe dit echter **nooit** als je met je
+eigen machine werkt (of een machine voor productiegebruik)
 
 ![](Pictures/100000000000031F00000298A2928719CEEB69B4.png)
 
 Vervolgens vraag het systeem jou een **standaard user** te maken (met root
-werk enkel bij administratieve taken zoals installaties).
+werk je enkel bij administratieve taken zoals installaties).
 
-**Maak** hiervoor een user **"student"** en bijhorend password.
+**Maak** hiervoor een user **"student"** en bijhorend password **student** (zelfde als bij root).
 
 ![](Pictures/10000000000003200000029C7CD38B4698B0D1F3.png)
 
@@ -286,9 +289,9 @@ werk enkel bij administratieve taken zoals installaties).
 
 #### Disk en partionering
 
-Volgende stap is het kiezen van waar op de harde schijf we Debian gaan
+Volgende stap is het kiezen op welke harde schijf (en of partitie) we Debian gaan
 installeren.  
-We kiezen voor **"Guided Partitioning"**
+We kiezen hier voor **"Guided Partitioning"**
 
 ![](Pictures/100000000000031B00000298AA7ED65DC857510A.png)
 
@@ -309,7 +312,12 @@ Het systeem stelt vervolgens een **overzicht** voor van **installatie**
 
 ![](Pictures/100000000000031E00000294AA4018F7B883F92C.png)
 
+Als je op Continue klikt kom je bij een laatste bevestigingsscherm, dit is - veiligheidshalve - aangeduid met **No**
+
 ![](Pictures/100000000000031B00000296CD5981FB355F67B3.png)
+
+Hier die je echter **Yes** te selecteren alvorens te kunnen verder gaan met installeren.  
+Eénmaal je hier je deze Yes bevestigt met Continue zal de installer wijzigingen naar je harde schijf beginnen te schrijven...
 
 ![](Pictures/100000000000031D0000029AE2D696A9F2EC2B20.png)
 
@@ -320,7 +328,7 @@ Vervolgens **start** de **installatie** van het **"base system"**, maw alle **so
 
 ![](Pictures/1000000000000317000002993A9C8C2A65B9ED07.png)
 
-Na deze installatie zal deze voorstellen of er nog installatie-media
+Na deze installatie zal deze **voorstellen** of er nog installatie-media
 zijn (extra CD's en/of USB-stick). Hier mag je gewoon **nee** kiezen, alle
 **volgende software gaan we installeren via het netwerk**.
 
@@ -328,24 +336,27 @@ zijn (extra CD's en/of USB-stick). Hier mag je gewoon **nee** kiezen, alle
 
 #### Installatie van (extra) software
 
-Ondertussen staat er een basis systeem geïnstalleerd waar je kan op
+Ondertussen staat er een **basis systeem** geïnstalleerd waar je kan op
 connecteren door middel van een text-terminal.
 
-We gaan echter nog software bij installeren zodat we ook een GUI ter
-beschikking hebben aangevuld met wat extra tools om het beheer van een
+We gaan echter nog **software** bij **installeren** zodat we ook een **GUI** ter
+beschikking hebben aangevuld met wat **extra** **tools** om het beheer van een
 systeem te kunnen uitvoeren.
 
 ##### Configureren van een package-manager
 
-Vele Linux-distributies werken met een package-manager.
+Vele Linux-distributies werken met een **package-manager**.
 
-Dit is een tool -- verbonden aan je distro - die je in staat stelt
-software te installeren.  
+Dit is een **tool** - verbonden aan je **distro** - die je in staat stelt
+**software** te installeren (en te onderhouden).  
+
 Naast de installatie zal een package-manager ook het nodige doen om deze
 software regelmatig up te daten met (gevalideerde) verbeteringen en/of
 security-patches.
 
-De **package-manager** gebruikt door Debian -- **aptitude** -- maakt gebruik van repositories op het internet om deze software te vinden en installeren.  
+> Je kan vanzelfsprekend ook software installeren zonder deze packagemanagers, maar deze garanderen meestal wel dat de versie van software die je installeert goed getest is op het systeem...
+
+De **package-manager** gebruikt door Debian - **aptitude** - maakt gebruik van repositories op het internet om deze software te vinden en installeren.  
 In de 2 volgende stappen dien je een mirror te installeren die deze
 software bevat...
 
@@ -372,9 +383,17 @@ De installer gaat vervolgens op zoek naar beschikbare software
 
 ![](Pictures/100000000000031900000292699108F2CEC2C964.png)
 
+Als dit gedaan is krijg je nog de vraag of je systeem statistieken mag doorsturen rond het installeren van packages.
+
+Hierop staat het je vrij dit te beslissen dit door te sturen of niet...
+
+![](Pictures/debian_popularity_contest.png)
+
+Wat je keuze ook is klik op Continue om de volgende stap van de installatie te starten...
+
 ##### Selecteren van software
 
-Ten slotte wordt er gevraagd welke software er nog bij worden
+Hier wordt er gevraagd welke software er nog bij worden
 geïnstalleerd.  
 
 We **kiezen** hier de **opties**:
@@ -392,10 +411,9 @@ downloaden en installeren...
 
 #### Bootloader installeren (GRUB)
 
-Een laatste -- maar noodzakelijke -- stap is het installeren van een
+Een laatste - maar noodzakelijke - stap is het installeren van een
 bootloader.  
-Dat is een software die - voordat het besturingssysteem wordt opgestart
--- een aantal noodzakelijke initialisaties doet.
+Dat is een stuk software die - voordat het besturingssysteem (en kernel) wordten opgestart - een aantal noodzakelijke initialisaties doet.
 
 Kies "Yes" om deze te installeren op je harde schijf...
 
@@ -406,11 +424,11 @@ selecteren\...
 
 ![](Pictures/100000000000031C000002974F92BC2762959572.png)
 
-Vervolgens wordt deze geinstalleerd ...
+Vervolgens wordt deze geïnstalleerd ...
 
 ![](Pictures/100000000000031A00000292007A4A8C18A54D1F.png)
 
-#### Beeindigen van de installatie
+#### Beëindigen van de installatie
 
 Na het installeren van de bootloader is de installatie compleet, als je
 nu op "Continue" zal de VM rebooten en zal Debian opstarten.
@@ -475,72 +493,80 @@ En bevestig je nog een laatste maal om deze CD/DVD te voorzien (insert)
 
 ![](Pictures/100000000000032000000256DFCBA1CD7892AF03.png)
 
-#### Installatie van de Guest Additions
+#### Installatie van de Guest Additions via de terminal
 
-Nu dat de installatie-scripts beschikbaar zijn kan je binnen je Guest
-(Debian) de **additions** installeren.
+Nu dat de installatie-scripts beschikbaar zijn kan je binnen je Guest (Debian) de **additions** installeren.
 
-Open hiervoor een terminal-scherm, klik **onderaan** in de **dock** op het **2de icon van links**.
+##### Openen van console
+
+Voor de volgende stap heb je een een terminal-scherm nodig, klik hiervoor  **onderaan** in de **dock** op het **2de ico
+n van links**.
 
 ![](Pictures/100000000000016800000031315CE3A519FC9352.png)
 
 Vervolgens krijg je een **console** geopend waar je **commandos** kan in
 uitvoeren (we komen hier in de volgende hoofdstukken nog ruim op terug)
 
+Vervolgens krijg je een **console** geopend waar je **commandos** kan in uitvoeren (we komen hier in de volgende hoofdstukken nog ruim op terug)
+
 ![](Pictures/10000000000003210000025BAF86F1A2EB214E99.png)
-height="5.0382in"}\
+
+##### Installatie via de console
+
 Eenmaal in de console voer je de volgende commando's uit:
 
-Je wijzigt de user in de shell naar root (su =\> switch user) via het
-volgende commando:
+Je wijzigt de user in de shell naar de root-user (su =\> switch user) via het volgende commando:
+
+Dit commando zal het password van je root-user opvragen (dat je eerder had ingegeven bij installatie).  
+Je zal niet wat je typt, dat is normaal bij command-line-apps als je je password intypt, druk gewoon enter als je password hebt ingegeven.
 
 ~~~
-$ su -
+student@studentdeb:~$ su -
+Password:
+root@studentdeb:~# 
 ~~~
 
-Je maakt een **mount-directory** aan:
+Zoals je ziet is de prompt bij deze console gewijzigd van "student@studentdeb:~$" naar "root@studentdeb:~#", dit houdt in dat je in root-modus bent beland...
+
+Vervolgens voer je het volgende commando uit binnen deze console:
 
 ~~~
-# mkdir -p /mnt/vboxguestadditions
+root@studentdeb:~# mount /media/cdrom0/
+mount: /media/cdrom0: WARNING: source write-protected, mounted read-only
+root@studentdeb:~#
 ~~~
 
-Je **mount** deze **directory** tov de guestadditions-cd
+Zoals je ziet geeft deze een kleine warning, deze mag je negeren.  
+Het volgende commando is de **eigenlijke installatie** van deze Guest-Additions.  
+Het commando dat je intypt (op de 1ste lijn) zal heel wat output geven zoals je hieronder ziet...
 
 ~~~
-# mount /media/cdrom /mnt/vboxguestadditions
+root@studentdeb:~# sh /media/cdrom0/VBoxLinuxAdditions.run --nox11
+Verifying archive integrity... All good.
+Uncompressing VirtualBox 6.1.38 Guest Additions for Linux........
+VirtualBox Guest Additions installer
+Copying additional installer modules ...
+Installing additional modules ...
+VirtualBox Guest Additions: Starting.
+VirtualBox Guest Additions: Building the VirtualBox Guest Additions kernel 
+modules.  This may take a while.
+VirtualBox Guest Additions: To build modules for other installed kernels, run
+VirtualBox Guest Additions:   /sbin/rcvboxadd quicksetup <version>
+VirtualBox Guest Additions: or
+VirtualBox Guest Additions:   /sbin/rcvboxadd quicksetup all
+VirtualBox Guest Additions: Kernel headers not found for target kernel 
+5.10.0-18-amd64. Please install them and execute
+  /sbin/rcvboxadd setup
+VirtualBox Guest Additions: Running kernel modules will not be replaced until 
+the system is restarted
+root@studentdeb:~# 
 ~~~
 
-Je navigeert naar deze
+De belangrijkste boodschap is echter vanonder:
 
-~~~
-# cd /mnt/vboxguestadditions
-~~~
+"Running kernel modules will not be replaced until 
+the system is restarted"
 
-Je voert de installatie-procedure uit door het volgende commando's:
 
-~~~
-sh ./VboxLinuxAdditions.run --nox11
-~~~
-
-![](Pictures/100000000000032200000258AFDEC1E52B0A4ECF.png)
-
-Eénmaal dit commando uitgevoerd krijg je een output vergelijkbaar met
-wat je hieronder ziet:
-
-![](Pictures/100000000000031F0000025BFC8FCE1C9B9B6BEE.png)
-
-De output geeft ondertussen ook aan dat je moet rebooten om deze
-wijzigingen te activeren.\
-Dit mag je doen via het men rechts boven door de optie logout te kiezen
-
-![](Pictures/100000000000031D0000025AC9B7003826D68E4E.png)
-
-en vervolgens "restart" te kiezen
-
-![](Pictures/100000000000032100000257779A9DBD025FA9FB.png)
-
-Na de reboot zal je zien dat de resolutie van je image zie zal vormen
-naar je scherm:
-
-![](Pictures/10000000000004840000033E9FF34BC5CD700979.png)
-height="4.8055in"}
+Dus je moet je systeem opnieuw herstarten alvorens deze Guestadditions beschikbaar zijn.  
+Naast een dynamische resolutie van je Guest-OS zal je ook in staat moeten zijn zaken te kunnen copieren tussen je HOST-OS en GUEST-OS (wel eerst via het Virtualbox-menu devices/Shared Clipboard activeren).
