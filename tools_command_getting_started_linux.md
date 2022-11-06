@@ -1083,7 +1083,7 @@ student@studentdeb:~$
 
 **Single** en **double** quotes hebben echter wel een **verschil** in **gedrag**...
 
-#### Variable-substution binnen strings
+#### Variable-substitution binnen strings
 
 Dit **verschil** komt naar voren bij het gebruik van **variable-substitution**  
 Als je een shell-variabele declareert kan je deze integreren binnen een string als hieronder geillustreerd.
@@ -1236,7 +1236,7 @@ Naast deze argumenten heb je nog een aantal andere speciale variabelen tot je be
 
 * **$0** => de naam van het script
 * **$#** => aantal argumenten
-* **$@** => alle argumenten op een rij
+* **$```@```** => alle argumenten op een rij
 * **$```*```** => alle argumenten op een rij als 1 string
 
 Als we deze toevoegen aan voorgaand script...
