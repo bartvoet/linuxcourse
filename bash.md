@@ -354,13 +354,74 @@ met als voorbeelden:
 
 ~~~bash
 #!/bin/bash
-# Basic if statement
 if [ $1 -gt 100 ]
 then
-    echo Hey that\'s a large number.
-    pwd
+    echo Nummer is groter dan 100.
 fi
 ~~~
+
+##### else if...
+
+In de meeste programmeertalen kan je ook naast else ook een "else if"-clausule toevoegen.  
+Deze zal andere alternatieven testen indien de if-clausule niet true evalueert.
+
+~~~bash
+#!/bin/bash
+if [ $1 -gt 100 ]
+then
+    echo Nummer is groter dan 100.
+elif [ $1 -gt 75 ]
+then
+    echo Nummer is tussen 76 en 100
+elif [ $1 -gt 50 ]
+then
+    echo Nummer is tussen 51 en 75
+else
+    echo Nummer is kleiner of gelijk aan 50
+fi
+~~~
+
+Als we deze testen met wat getallen...
+
+~~~
+$ ./hello.sh 101
+Nummer is groter dan 100.
+$ ./hello.sh 99
+Nummer is tussen 76 en 100
+$ ./hello.sh 65
+Nummer is tussen 51 en 75
+$ ./hello.sh 50
+Nummer is kleiner of gelijk aan 50
+$ 
+~~~
+
+##### not/inversie
+
+Je kan je test ook inverteren, als ik bijvoorbeeld het omgekeerde
+wil van groter dan 100 kan ik de eigenlijke test inverteren met een uitroepteken.
+
+~~~bash
+#!/bin/bash
+if [ ! $1 -gt 100 ]
+then
+    echo Nummer is niet groter dan 100.
+else
+    echo Nummber is groter dan 100
+fi
+~~~
+
+Deze mag eventueel ook buiten de haakjes staan
+
+~~~bash
+#!/bin/bash
+if ! [ $1 -gt 100 ]
+then
+    echo Nummer is niet groter dan 100.
+else
+    echo Nummber is groter dan 100
+fi
+~~~
+
 
 ##### Testen op string-waardes
 
@@ -379,14 +440,16 @@ Voorbeelden:
 
 ~~~bash
 #!/bin/bash
-if [ $1 = "go" ]; then
+if [ $1 = "go" ]
+then
         echo "go"
 fi
 ~~~
 
 ~~~bash
 #!/bin/bash
-if [ -n $1 ]; then
+if [ -n $1 ]
+then
         echo "geen lege string"
 fi
 ~~~
@@ -408,11 +471,13 @@ Het volgende voorbeeld kijkt na of het argument een file is:
 
 ~~~bash
 #!/bin/bash
-if [ $# -eq 0 ]; then
+if [ $# -eq 0 ]
+then
         echo Er zijn geen argumenten.
 else
         echo Er zijn $# argumenten.
-        if [ -e $1 ]; then
+        if [ -e $1 ]
+        then
                 echo Het bestand $1 bestaat.
         else
                 echo Het bestand $1 bestaat niet.
