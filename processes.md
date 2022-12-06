@@ -943,8 +943,6 @@ Vervolgens zal nano open waar je een crontab kan toevoegen:
 # m h  dom mon dow   command
 ~~~
 
-
-
 Volgend commando zal bijvoorbeeld elke minuut een lijn met het tijdstip toevoegen aan de file
 /home/student/text
 
@@ -998,3 +996,93 @@ Wed 22 Dec 2021 04:30:46 PM CET
 Wed 22 Dec 2021 04:31:46 PM CET
 student@studentdeb:~$ 
 ~~~
+
+#### Andere opties
+
+Zoals we eerder aangeven zorgt het asterisk-teken ervoor dat de specifieke
+precisie (minuut - uur - dag - maand - weekdag) niet uitmaakt
+
+In het onderstaande voorbeeld zal cron ervoor zorgen dat het script wordt 
+uitgevoerd om 18 uur en 5 minuten.  
+De dag, maand of weekdag zal hier niet bij uitmaken
+
+~~~
+# 05 18 * * *     echo "hello $(date)" >> /home/student/test.txt
+~~~
+
+Je kan dit echter nog verfijnen met behulp van een aantal andere opties
+
+##### Lijst
+
+Je kan een lijst specifieren bijvoorbeeld, dit doe je door cijfers aan te duiden 
+gescheiden door comma's.  
+Als je bijvoorbeeld enkel de 1ste en de 15de van de maand het script wil uitvoeren:
+
+~~~
+# 05 18 1,15 * *     echo "hello $(date)" >> /home/student/test.txt
+~~~
+
+Of je wil om zowel 12:05 en 18:05 uitvoeren...
+
+~~~
+# 05 12,18 * * *     echo "hello $(date)" >> /home/student/test.txt
+~~~
+
+##### Bereik
+
+Naast een lijst kan je ook een bereik instellen door een streepje te plaatsen
+tussen 2 getallen.
+
+Bijvoorbeeld in onderstaand voorbeeld zal het script elk uur worden uit tussen
+9 en 17.  
+Let wel, het is tot en met, 17 is inbegrapen in dit bereik/range
+
+~~~
+# 05 9-17 * * *     echo "hello $(date)" >> /home/student/test.txt
+~~~
+
+Je kan dit bijvoorbeeld ook gebruiken om dit script enkel tijdens weekdagen
+in te plannen (1=Maandag tem 5=Vrijdag)
+
+~~~
+# 05 18 * * 1-5     echo "hello $(date)" >> /home/student/test.txt
+~~~
+
+##### Stappen
+
+Een meer complexere is het gebruik van stappen.  
+Dit houdt in dat je een startwaarde geeft, gevolgd door een /, 
+gevolgd door de stappen waarmee je wil verhogen
+
+Stel bijvoorbeeld dat je het script enkel op even dagen wil uitvoeren kan je het 
+volgende script uitvoeren.
+
+~~~
+# 05 18 2/2 * *     echo "hello $(date)" >> /home/student/test.txt
+~~~
+
+##### Onofficiele toevoegingen
+
+De reeks van 5 posities kan ook vervangen worden door 1 van volgende waardes
+
+~~~
+@yearly	
+@annually
+@monthly
+@weekly
+@daily
+@hourly
+@reboot
+~~~
+
+Je mag deze letterlijk vertalen, yearly is jaarlijks, monthly elke maand, ...  
+Hou echter rekening mee dat deze niet noodzakelijk in elke distributie worden ondersteund 
+dus het gebruik wordt bij deze afgeraden
+
+#### Extra info
+
+Een handige website om je crontabs te testen is https://crontab.guru/
+
+#### Alternatief: systemd-timers
+
+Een belangrijke nieuwere implementatie is voorzien in systemd, deze worden in het systemd-hoofdstuk behandeld
