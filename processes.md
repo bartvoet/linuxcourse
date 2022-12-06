@@ -424,7 +424,7 @@ Als eerste starten we een langdurende job (die de prompt zal onderbreken)
 * Terminal 1:
 
 ~~~
-bvo@kataja:~$ sleep 5000
+$ sleep 5000
 ~~~
 
 We openen een aparte console om het PID op te zoeken
@@ -432,9 +432,9 @@ We openen een aparte console om het PID op te zoeken
 * Terminal 2:
 
 ~~~
-bvo@kataja:~$ ps -u bvo | grep sleep
+$ ps -u bvo | grep sleep
 50663 pts/23   00:00:00 sleep
-bvo@kataja:~$ ps -f 50663 | grep sleep
+$ ps -f 50663 | grep sleep
 bvo      50663 57255  0 13:49 pts/23   S      0:00 sleep 5000
 ~~~
 
@@ -447,8 +447,8 @@ We sturen het SIGSTOP-signaal (19) om er voor te zorgen dat deze job stopt (pauz
 * Terminal 2:
 
 ~~~
-bvo@kataja:~$ kill -19 50663
-bvo@kataja:~$ ps -f 50663 | grep sleep
+$ kill -19 50663
+$ ps -f 50663 | grep sleep
 bvo      50663 57255  0 13:49 pts/23   T      0:00 sleep 5000
 ~~~
 
@@ -458,9 +458,9 @@ Daar kunnen we zien (via het commando jobs dat we zo dadelijk verder uitleggen) 
 * Terminal 1:
 
 ~~~
-bvo@kataja:~$ jobs
+$ jobs
 [1]+  Stopped                 sleep 5000
-bvo@kataja:~$ 
+$ 
 ~~~
 
 De job staat dan wel in de stop-state (T), dit betekent echter niet dat deze job beeindigd is.  
@@ -469,10 +469,10 @@ We kunnen deze job laten herstarten via het SIGSTART-signaal (18).
 * Terminal 2:
 
 ~~~
-bvo@kataja:~$ kill -18 50663
-bvo@kataja:~$ ps -f 50663 | grep sleep
+$ kill -18 50663
+$ ps -f 50663 | grep sleep
 bvo      50663 57255  0 13:49 pts/23   S      0:00 sleep 5000
-bvo@kataja:~$
+$
 ~~~
 
 Aan de kant van terminal 1 zien we dat deze job ook runnig is (weliswaar in de achtergrond)
@@ -480,9 +480,9 @@ Aan de kant van terminal 1 zien we dat deze job ook runnig is (weliswaar in de a
 * Terminal 1:
 
 ~~~
-bvo@kataja:~$ jobs
+$ jobs
 [1]+  Running                 sleep 5000 &
-bvo@kataja:~$ fg
+$ fg
 sleep 5000
 ~~~
 
@@ -668,11 +668,11 @@ In het onderstaande voorbeeld starten we 3 jobs adhv het commando sleep
 > deze wordt veel gebruikt binnen scripten om voor een delay te zorgen
 
 ~~~
-bvo@kataja:~$ sleep 360 &
+$ sleep 360 &
 [1] 31056
-bvo@kataja:~$ sleep 365 &
+$ sleep 365 &
 [2] 31452
-bvo@kataja:~$ sleep 370 &
+$ sleep 370 &
 [3] 31714
 ~~~
 
@@ -682,7 +682,7 @@ Bash houdt alle jobs binnen je bash-sessie bij in een job-table.
 Zoals eerder getoond kan je hier het commando jobs voor gebruiken, de short option l zorgt ervoor dat je deze kan correleren met het process-id
 
 ~~~
-bvo@kataja:~$ jobs -l
+$ jobs -l
 [1]  31056 Running                 sleep 360 &
 [2]- 31452 Running                 sleep 365 &
 [3]+ 31714 Running                 sleep 370 &
@@ -699,7 +699,7 @@ Als we nu de job-table bekijken zien we dat er 3 jobs draaien:
 De processen die gelinkt zijn aan deze job vind je terug via ps (zie PID's):
 
 ~~~
-bvo@kataja:~$ ps -l
+$ ps -l
 F S   UID   PID  PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
 0 S  1173  2425  2424  0  80   0 -  2141 -      pts/16   00:00:00 bash
 0 S  1173 31056  2425  0  80   0 -  1315 hrtime pts/16   00:00:00 sleep
@@ -713,7 +713,7 @@ F S   UID   PID  PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
 Stel dat je 1 van de jobs terug naar de voorgrond wil brengen dan kan je dit doen via het fg-commando.
 
 ~~~
-bvo@kataja:~$ jobs -l
+$ jobs -l
 [1]  31056 Running                 sleep 360 &
 [2]- 31452 Running                 sleep 365 &
 [3]+ 31714 Running                 sleep 370 &
@@ -722,7 +722,7 @@ bvo@kataja:~$ jobs -l
 Hiervoor duid je de job aan die je wenst naar de voorgrond te brengen met een % gevolgd door de jobnummer (niet de pid)
 
 ~~~
-bvo@kataja:~$ fg %2
+$ fg %2
 sleep 365
 ~~~
 
@@ -733,17 +733,17 @@ Job met nummer 2 wordt dan opnieuw naar de voorgrond en de prompt wordt dan opni
 Als je nu (vanuit deze shell) de job terug naar de achtergrond wil brengen gebruik je Ctrl+z hetgeen een stop-signaal zal zenden naar het process gelinkt naar deze job.
 
 ~~~
-bvo@kataja:~$ fg %2
+$ fg %2
 sleep 365
 ^Z
 [2]+  Stopped                 sleep 365
-bvo@kataja:~$
+$
 ~~~
 
 De prompt komt terug vrij maar de job blijft echter nog in een stop-status
 
 ~~~
-bvo@kataja:~$ jobs -l
+$ jobs -l
 [1]  31056 Running                 sleep 360 &
 [2]+ 31452 Stopped                 sleep 365
 [3]- 31714 Running                 sleep 370 &
@@ -752,7 +752,7 @@ bvo@kataja:~$ jobs -l
 Het je ook terugvindt in de proces-table, zie pid 31452 dat in status T staat.
 
 ~~~
-bvo@kataja:~$ ps -l
+$ ps -l
 F S   UID   PID  PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
 0 S  1173  2425  2424  0  80   0 -  2141 -      pts/16   00:00:00 bash
 0 S  1173 31056  2425  0  80   0 -  1315 hrtime pts/16   00:00:00 sleep
@@ -765,9 +765,9 @@ Om het proces terug te hervatten kan je die doen via het commando bg.
 Deze zal de job terug in running-state plaatsen en het process hervatten.
 
 ~~~
-bvo@kataja:~$ bg %2
+$ bg %2
 [2]+ sleep 365 &
-bvo@kataja:~$ jobs -l
+$ jobs -l
 [1]  31056 Running                 sleep 360 &
 [2]- 31452 Running                 sleep 365 &
 [3]+ 31714 Running                 sleep 370 &
@@ -783,19 +783,19 @@ De meest éénvoudige manier om een job te beeindigen is het volgende 2-stappen-
 * Deze job vervolgens te stoppen via Ctrl+c
 
 ~~~
-bvo@kataja:~$ fg %3
+$ fg %3
 sleep 370
 ^C
-bvo@kataja:~$ 
+$ 
 ~~~
 
 Vervolgens zal je zien dat deze job gestopt is (en verwijderd uit de job-table)
 
 ~~~
-bvo@kataja:~$ jobs
+$ jobs
 [1]-  Running                 sleep 360 &
 [2]+  Running                 sleep 365 &
-bvo@kataja:~$
+$
 ~~~
 
 #### Beeindigen via kill
@@ -804,25 +804,25 @@ Je kan een job ook beindigen adhv het kill commando.
 Gegeven dat je onderstaande job-table overhebt...
 
 ~~~
-bvo@kataja:~$ jobs
+$ jobs
 [1]-  Running                 sleep 360 &
 [2]+  Running                 sleep 365 &
-bvo@kataja:~$
+$
 ~~~
 
 ...kan je deze job stoppen met hulp van de percentage-notatie (je hoeft niet de pid te gebruiken)
 
 ~~~
-bvo@kataja:~$ kill %1
+$ kill %1
 ~~~
 
 Deze job zie je nadien nog in de job-table met de status "Terminated"
 
 ~~~
-bvo@kataja:~$ jobs
+$ jobs
 [1]-  Terminated              sleep 360
 [2]+  Running                 sleep 365 &
-bvo@kataja:~$
+$
 ~~~
 
 #### Done...
@@ -830,10 +830,10 @@ bvo@kataja:~$
 Als we de overblijvende job laten "uitdraaien" dan zal deze job uiteindelijk (na +- 365 seconden in de )
 
 ~~~
-bvo@kataja:~$ jobs
+$ jobs
 [2]+  Done                    sleep 365
-bvo@kataja:~$ jobs
-bvo@kataja:~$
+$ jobs
+$
 ~~~
 
 Eénmaal de info is opgevraagd verdwijnt deze job uit de jobtable...
