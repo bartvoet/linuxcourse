@@ -92,7 +92,7 @@ Gegeven een directory dossiers, hoe kan je een volledige directory met inhoud ko
 
 ~~~
 
-Welk commando gebruik je om je huidgie working directory te zien?
+Welk commando gebruik je om je huidige working directory te zien?
 
 ~~~
 
