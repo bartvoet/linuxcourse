@@ -1,4 +1,4 @@
-## Aanmaken van extra netwerk
+## Aanmaken van extra netwerk tussen 2 hosts
 
 Beide VM's kregen (by default) 1 netwerkadapter (en NIC) om te
 connecteren aan de buitenwereld.
@@ -143,6 +143,8 @@ PING fe80::a00:27ff:fe1c:bf74%enp0s8(fe80::a00:27ff:fe1c:bf74%enp0s8) 56 data by
 rtt min/avg/max/mdev = 0.895/1.327/1.843/0.384 ms
 root@studentdeb:~# 
 ~~~
+
+We testen ondertussen ook van de andere kant
 
 ~~~
 [student@fedora ~]$ ping fe80::a00:27ff:fe4a:c521%enp0s8

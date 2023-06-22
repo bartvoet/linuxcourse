@@ -1,3 +1,5 @@
+## Pakketbeheer
+
 apt is een commando voor het installeren, bijwerken, verwijderen en 
 beheren van pakketten op Debian, Ubuntu, en gerelateerde Linux-distributies.  
 
@@ -5,7 +7,7 @@ Het combineert de meest gebruikte opdrachten van de tools 2 andere tools
 - apt-get en apt-cache - met verschillende default-waarden van sommige opties.
 
 
-## Update van de package index (apt update) 
+### Update van de package index (apt update) 
 
 De APT-pakketindex is in feite een database die records bevat 
 van beschikbare pakketten uit de repositories die in voor je systeem 
@@ -21,9 +23,9 @@ Zie dat je altijd deze package index "update" alvorens een upgrade of een instal
 uit te voeren.
 
 
-## Pakketten upgraden 
+### Pakketten upgraden 
 
-### upgrade-command (apt upgrade)
+#### upgrade-command (apt upgrade)
 
 Het regelmatig bijwerken van je software is een heel belangrijk aspect van de systeembeveiliging.  
 Voer het volgende uit om de geïnstalleerde pakketten naar hun nieuwste versies te upgraden:
@@ -41,7 +43,7 @@ Als je 1 enkel pakket wilt upgraden, geeft je de pakketnaam door:
 (waar je package_name vervangt door de echte package)
 
 
-## Volledige upgrade (apt volledige upgrade)
+#### Volledige upgrade (apt full-upgrade)
 
 Het verschil tussen upgrade en volledige upgrade is dat de laatste 
 de geïnstalleerde pakketten zal verwijderen als dat nodig is 
@@ -52,7 +54,7 @@ om het hele systeem te upgraden.
 ~~~
 
 
-## Pakketten installeren (apt install)
+### Pakketten installeren (apt install)
 
 Het installeren van pakketten is net zo eenvoudig als het uitvoeren van de volgende opdracht:
 
@@ -67,7 +69,7 @@ geeft je ze mee met spaties gescheiden:
 # apt install pakket1 pakket2
 ~~~
 
-## Repositories
+### Repositories
 
 De pakketten die je installeert worden vanuit een database gedownload.  
 De locatie waar deze pakketten staan noemt men een repository.  
@@ -100,7 +102,7 @@ deb-src http://deb.debian.org/debian/ bullseye-updates main
 
 ~~~
 
-## Lokale deb-bestanden
+### Lokale deb-bestanden
 
 De pakketten die worden geïnstalleerd hebben een specifiek formaat dat we deb noemen.  
 Dit is een compresseerde file die de binaries en andere bestanden bevat die je in je
@@ -141,7 +143,7 @@ Als je het pakket - inclusief alle configuratiebestanden - wilt verwijderen, geb
 ~~~
 
 
-### Verwijder ongebruikte pakketten (apt autoremove)
+### Verwijdereb ongebruikte pakketten (apt autoremove)
 
 Telkens wanneer een nieuw pakket (dat afhankelijk is van andere pakketten) op het systeem wordt geïnstalleerd, worden de dependencies ook geïnstalleerd.  
 
@@ -206,6 +208,26 @@ Om alleen de geïnstalleerde pakketten weer te geven typt u:
 
 ~~~
 # apt list --installed
+accountsservice/focal-updates,focal-security,now 0.6.55-0ubuntu12~20.04.5 amd64 [installed]
+acl/focal,now 2.2.53-6 amd64 [installed]
+acpi-support/focal,now 0.143 amd64 [installed]
+acpid/focal,now 1:2.0.32-1ubuntu1 amd64 [installed]
+adb/focal,now 1:8.1.0+r23-5ubuntu2 amd64 [installed]
+add-apt-key/focal,focal,now 1.0-0.5 all [installed]
+adduser/focal,focal,now 3.118ubuntu2 all [installed]
+adwaita-icon-theme-full/focal-updates,focal-updates,now 3.36.1-2ubuntu0.20.04.2 all [installed]
+adwaita-icon-theme/focal-updates,focal-updates,now 3.36.1-2ubuntu0.20.04.2 all [installed]
+aglfn/focal,focal,now 1.7+git20191031.4036a9c-2 all [installed]
+alsa-base/focal,focal,now 1.0.25+dfsg-0ubuntu5 all [installed]
+alsa-topology-conf/focal,focal,now 1.2.2-1 all [installed]
+alsa-ucm-conf/focal-updates,focal-updates,now 1.2.2-1ubuntu0.13 all [installed]
+alsa-utils/focal-updates,now 1.2.2-1ubuntu2.1 amd64 [installed]
+amd64-microcode/focal,now 3.20191218.1ubuntu1 amd64 [installed]
+anacron/focal,now 2.3-29 amd64 [installed]
+android-libadb/focal,now 1:8.1.0+r23-5ubuntu2 amd64 [installed,automatic]
+android-libbase/focal,now 1:8.1.0+r23-5ubuntu2 amd64 [installed,automatic]
+android-libboringssl/focal,now 8.1.0+r23-2build1 amd64 [installed,automatic]
+...
 ~~~
 
 Als je de ​​lijst wil krijgen van de pakketten die kunnen "ge-upgraded"
@@ -213,6 +235,12 @@ worden geef je volgend commando:
 
 ~~~
 # apt list --upgradeable
+Listing...
+chromium/ulyssa 108.0.5359.124~linuxmint1+una amd64 [upgradable from: 108.0.5359.98~linuxmint1+una]
+firefox-locale-en/ulyssa 108.0.1+linuxmint1+una amd64 [upgradable from: 108.0+linuxmint1+una]
+firefox/ulyssa 108.0.1+linuxmint1+una amd64 [upgradable from: 108.0+linuxmint1+una]
+libodbc1/bullseye 2.3.7 amd64 [upgradable from: 2.3.6-0.1build1]
+...
 ~~~
 
 ### Pakketten zoeken (apt search)
@@ -262,5 +290,5 @@ Description: Drop-down terminal for GNOME Desktop Environment
  Guake is a drop-down terminal for GNOME Desktop Environment, so you just
  need to press a key to invoke him, and press again to hide.
  Guake supports hotkeys, tabs, background transparent, etc.
- #
+#
 ~~~

@@ -158,7 +158,7 @@ De volgende **crontab** zal elke dag om **18.05** het **script** aanroepen
 # m h  dom mon dow   command
 
 # * * * * * /home/student/backup.sh /home/student/blabla
-15 18 * * * /home/student/integration_excercise/create_daily_folder.sh /home/student/shared
+5 18 * * * /home/student/integration_excercise/create_daily_folder.sh /home/student/shared
 ~~~
 
 #### Users en rechten (deel 6)
